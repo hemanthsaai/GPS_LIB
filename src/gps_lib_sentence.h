@@ -72,7 +72,6 @@ typedef struct _nmeaPOS
 typedef struct _nmeaSATELLITE
 {
     int     id;         /**< Satellite PRN number */
-    int     in_use;     /**< Used in position fix */
     int     elv;        /**< Elevation in degrees, 90 maximum */
     int     azimuth;    /**< Azimuth, degrees from true north, 000 to 359 */
     int     sig;        /**< Signal, 00-99 dB */

@@ -13,7 +13,7 @@
 #include "he_std.h"
 #include "gps_lib_sentence.h"
 
-char * nmea_databuf = "$GPRMC,185853.81,A,5001.2959,N,3613.0434,E,15.2,333.7,240420,333.7,E,A*3F";
+char * nmea_databuf = "$GPGSV,2,2,08,05,05,185,80,06,05,230,80,07,05,275,80,08,05,320,80*71";
 int main(void) {
 	int ptype;
 	nmeaGPGGA info_gpgga;

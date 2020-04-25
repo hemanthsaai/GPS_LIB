@@ -117,7 +117,7 @@ double he_a2f(char *buf)
 	int exponent_int = 0;
 	int itr,t,c=1;
 	double significand_float,exponent_float;
-	if(strchr(buf,'.'))
+	if(he_strchr(buf,'.'))
 	{
 		for(itr=0;buf[itr]!='.';++itr)
 		{

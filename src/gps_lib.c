@@ -95,7 +95,7 @@ void extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 	char buf_extract[15] = {0};
 	int itr0 = 0;
 	int itr1 = 0;
-	char swt_case_itr = 0;
+	char swt_case_idx = 0;
 	int intbuf;
 	double doublebuf;
 	char charbuf[15];
@@ -115,14 +115,14 @@ void extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		buf_extract[itr1] = 0;	// end of string is written to buffer
 		if( nmea_databuf[itr0] == '*' )
 		{
-
+			/* Last element in nmea packet do not increment itr0 , so while loop will fail */
 		}
 		else
 		{
-			itr0++;
+			itr0++;			/* Increment itr0 so loop continues to next element */
 		}
 
-		switch(swt_case_itr++)			//Each case for each element in the buffer
+		switch(swt_case_idx++)			//Each case for each element in the buffer
 		{
 		case 0:
 			he_strcpy(buf_extract,charbuf,2);
@@ -246,13 +246,15 @@ void extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 	}
 }
 
-
+/**
+ * \brief Extracts nmea_databuf data and fills info_gpgsa structure
+ */
 void extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 {
 	char buf_extract[5] = {0};
 	int itr0 = 0;
 	int itr1 = 0;
-	char swt_case_itr = 0;
+	char swt_case_idx = 0;
 
 	nmea_databuf = nmea_databuf + 7;
 #ifdef DEBUG
@@ -266,8 +268,15 @@ void extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			buf_extract[itr1] = nmea_databuf[itr0];  // extract the data between two commas
 		}
 		buf_extract[itr1] = 0;	// end of string is written to buffer
-		itr0++;
-		switch(swt_case_itr++)			//Each case for each element in the buffer
+		if( nmea_databuf[itr0] == '*' )
+		{
+			/* Last element in nmea packet do not increment itr0 , so while loop will fail */
+		}
+		else
+		{
+			itr0++;			/* Increment itr0 so loop continues to next element */
+		}
+		switch(swt_case_idx++)			//Each case for each element in the buffer
 		{
 		case 0:
 			info_gpgsa->fix_mode = buf_extract[0] ;
@@ -385,13 +394,18 @@ void extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 }
 
 
-
+/**
+ * \brief Extracts nmea_databuf data and fills info_gpgsv structure
+ */
 void extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 {
 	char buf_extract[5] = {0};
 	int itr0 = 0;
 	int itr1 = 0;
-	//char swt_case_itr = 0;
+	int sat_data_idx = 0;
+	char swt_case_idx = 0;
+
+	nmea_databuf = nmea_databuf + 7;
 
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
@@ -404,32 +418,88 @@ void extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		buf_extract[itr1] = 0;	// end of string is written to buffer
 		if( nmea_databuf[itr0] == '*' )
 		{
-
+			/* Last element in nmea packet do not increment itr0 , so while loop will fail */
 		}
 		else
 		{
-			itr0++;
+			itr0++;				/* Increment itr0 so loop continues to next element */
 		}
-		//printf("%s\n",buf_extract);
+
+		if(swt_case_idx >= 7)			// each nmea packet has 4 satellite information
+		{								// to reuse the same cases in the switch once we reach the end then we
+			swt_case_idx -= 4;          // reduce the swt_case_idx to 4 so, we have same cases to get data
+			sat_data_idx ++;
+		}
+
+		switch(++swt_case_idx)			//Each case for each element in the buffer
+		{
+		case 1:
+			info_gpgsv->pack_count = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("pack_count  %d\n",info_gpgsv->pack_count);
+#endif
+			break;
+		case 2:
+			info_gpgsv->pack_index = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("pack_index  %d\n",info_gpgsv->pack_index);
+#endif
+			break;
+		case 3:
+			info_gpgsv->sat_count = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("sat_count  %d\n",info_gpgsv->sat_count);
+#endif
+			break;
+		case 4:
+			info_gpgsv->sat_data[sat_data_idx].id = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("sat_data[%d].id  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].id);
+#endif
+			break;
+		case 5:
+			info_gpgsv->sat_data[sat_data_idx].elv = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("sat_data[%d].elv  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].elv);
+#endif
+			break;
+		case 6:
+			info_gpgsv->sat_data[sat_data_idx].azimuth = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("sat_data[%d].azimuth  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].azimuth);
+#endif
+			break;
+		case 7:
+			info_gpgsv->sat_data[sat_data_idx].sig = he_a2i(buf_extract);
+#ifdef DEBUG
+			printf("sat_data[%d].sig  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].sig);
+#endif
+			break;
+		default:
+			printf("GPGSV:  ERROR  %s\n",buf_extract);
+			break;
+		}
 	}
-	printf("GPGSV WARNING:  IMPLEMENTATION PENDING\n");
+	printf("GPGSV ERROR:  IMPLEMENTATION PENDING \nGPGSV has multiple packets this function handles only one packet\n");
 	fflush(stdout);
 }
 
 
+/**
+ * \brief Extracts nmea_databuf data and fills info_gprmc structure
+ */
 void extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 {
 	char buf_extract[15] = {0};
 	int itr0 = 0;
 	int itr1 = 0;
-	char swt_case_itr = 0;
+	char swt_case_idx = 0;
 	int intbuf;
 	double doublebuf;
 	char charbuf[15];
 
 	nmea_databuf = nmea_databuf + 7;
-	printf("%s\n",nmea_databuf);
-	fflush(stdout);
+
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
 		for(itr1=0; ((nmea_databuf[itr0]  != ','  ) &&
@@ -441,13 +511,13 @@ void extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		buf_extract[itr1] = 0;	// end of string is written to buffer
 		if( nmea_databuf[itr0] == '*' )
 		{
-
+			/* Last element in nmea packet do not increment itr0 , so while loop will fail */
 		}
 		else
 		{
-			itr0++;
+			itr0++;			/* Increment itr0 so loop continues to next element */
 		}
-		switch(++swt_case_itr)			//Each case for each element in the buffer
+		switch(++swt_case_idx)			//Each case for each element in the buffer
 		{
 			case 1:
 				he_strcpy(buf_extract,charbuf,2);
@@ -566,12 +636,16 @@ void extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 }
 
 
+
+/**
+ * \brief Extracts nmea_databuf data and fills info_gpvtg structure
+ */
 void extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 {
 	char buf_extract[5] = {0};
 	int itr0 = 0;
 	int itr1 = 0;
-	char swt_case_itr = 0;
+	char swt_case_idx = 0;
 
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
@@ -584,14 +658,14 @@ void extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		buf_extract[itr1] = 0;	// end of string is written to buffer
 		if( nmea_databuf[itr0] == '*' )
 		{
-
+			/* Last element in nmea packet do not increment itr0 , so while loop will fail */
 		}
 		else
 		{
-			itr0++;
+			itr0++;				/* Increment itr0 so loop continues to next element */
 		}
 
-		switch(++swt_case_itr)			//Each case for each element in the buffer
+		switch(++swt_case_idx)			//Each case for each element in the buffer
 		{
 		case 1:
 			info_gpvtg->dir = he_a2f(buf_extract);
