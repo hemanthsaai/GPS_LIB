@@ -10,67 +10,64 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "he_nmea_lib.h"
 #include "he_std.h"
-#include "gps_lib_sentence.h"
 
-char * nmea_databuf = "$GPGSV,2,2,08,05,05,185,80,06,05,230,80,07,05,275,80,08,05,320,80*71";
+char *command[] = {	"AT+QGNSSRD=GGA",
+					"AT+QGNSSRD=GSA",
+					"AT+QGNSSRD=GSV",
+					"AT+QGNSSRD=RMC",
+					"AT+QGNSSRD=VTG"} ;
+
+char *Response[] = {"$GPGGA,S,KDfh,klasdhas,dbfgiad,fhvoiadf,hoahg,fgo;arerong yergfaoweyefewp;f *3D",
+					//"$GPGGA,,,,,,,,,,sdgsdgfhtrshrsthrthththaerggetghgher,,,,",
+					//"$GPGGA,SKDfhklasdhasd32161863oiadfhoahgfgo;arhg aerong yergfaoweyefewp;f*2E",
+					"$GPGSA,A,3,01,02,03,04,05,06,07,08,00,00,00,00,0.0,0.0,0.0*3a",
+					"$GPGSV,2,1,08,01,05,005,80,02,05,050,80,03,05,095,80,04,05,140,80*7f",
+					"$GPRMC,185849.80,A,5001.2652,N,3613.0586,E,11.2,349.0,240420,349.0,E,A*3d",
+					"$GPVTG,349.0,T,349.0,M,11.2,N,20.8,K*46"};
+
+//char * nmea_databuf = "$GPGSV,2,2,08,05,05,185,80,06,05,230,80,07,05,275,80,08,05,320,80*71";
+char *nmea_databuf;
+
+
 int main(void) {
-	int ptype;
-	nmeaGPGGA info_gpgga;
-	nmeaGPGSA info_gpgsa;
-	nmeaGPGSV info_gpgsv;
-	nmeaGPRMC info_gprmc;
-	nmeaGPVTG info_gpvtg;
-/*	FILE *fptr;
-	char nmea_databuf[200];
-	if ((fptr = fopen("gpslog.txt", "r")) == NULL) {
-	        printf("Error! opening file");
-	        exit(1);
-	    }
-	while(!feof(fptr))
-	{
-		fgets(nmea_databuf, 200, fptr);
-		if( strlen(nmea_databuf) < 10)
-		{
-			continue;
-		}
-*/
-		if(CHECKSUM_VALID == nmea_checksum(nmea_databuf))
-		{
-			ptype = nmeatype_check(nmea_databuf);
-			switch (ptype)
-			{
-			case GPNON:
-				printf("NO INPUT");
-				break;
-			case GPGGA:
-				printf("GPGGA");
-				extract_nmeaGPGGA(&info_gpgga,nmea_databuf);
-				break;
-			case GPGSA:
-				printf("GPGSA");
-				extract_nmeaGPGSA(&info_gpgsa,nmea_databuf);
-				break;
-			case GPGSV:
-				printf("GPGSV");
-				extract_nmeaGPGSV(&info_gpgsv,nmea_databuf);
-				break;
-			case GPRMC:
-				printf("GPRMC");
-				extract_nmeaGPRMC(&info_gprmc,nmea_databuf);
-				break;
-			case GPVTG:
-				printf("GPVTG");
-				extract_nmeaGPVTG(&info_gpvtg,nmea_databuf);
-				break;
-			default:
-				printf("error");
-				break;
-			}
-			fflush(stdout);
-			nmea_databuf[0] = 0;
-/*		}*/
 
+	int nmea_sts = NMEA_INVALID;
+	nmea_grp_type nmea_data;
+	char Input[20];
+	scanf("%s",Input);
+	nmea_databuf = 0;
+
+	for(int iter = 0; iter <5; iter ++)
+	{
+		if(!strcmp(command[iter],Input))
+		{
+			nmea_databuf = Response[iter];
+			//printf("%s\n",Response[iter]);
+		}
 	}
+	printf("%s\n",nmea_databuf);
+	if(nmea_databuf)
+	{
+		nmea_sts = he_nmea_main(nmea_databuf,&nmea_data);
+		if(nmea_sts == NMEA_VALID)
+		{
+			printf("SUCCESS\n");
+			printf("%d\n",nmea_data.nmea_pkt_type);
+		}
+		else
+		{
+			printf("FAIL\n");
+		}
+	}
+	else
+	{
+		printf("INVALID\n");
+	}
+
+
+
 	return EXIT_SUCCESS;
 }

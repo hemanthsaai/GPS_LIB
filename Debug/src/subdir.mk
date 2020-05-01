@@ -5,17 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../src/Library.c \
-../src/gps_lib.c \
+../src/he_nmea_lib.c \
 ../src/he_std.c 
 
 OBJS += \
 ./src/Library.o \
-./src/gps_lib.o \
+./src/he_nmea_lib.o \
 ./src/he_std.o 
 
 C_DEPS += \
 ./src/Library.d \
-./src/gps_lib.d \
+./src/he_nmea_lib.d \
 ./src/he_std.d 
 
 

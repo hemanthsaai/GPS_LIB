@@ -1,15 +1,70 @@
 /*
  ============================================================================
- Name        : gps_lib.c
+ Name        : he_nmea_lib.c
  Author      : HemanthJsai
  Version     : 1.0
  Copyright   : Copyright Protected, HS
  Description : Ansi-style
  ============================================================================
  */
+#include "he_nmea_lib.h"
+
 #include "he_std.h"
-#include "gps_lib_sentence.h"
 #include <stdio.h>
+
+/*
+ * Check if the nmea has * and ,
+ * because after this all the functions consider the line ending as *
+ * so filter the data here to avoid garbage in further modules
+ *
+ * Returns NMEA_VALID if the buffer is valid input for further processing
+ */
+int nmea_canbeparsed(char *nmea_databuf)
+{
+	int ret_sts = NMEA_INVALID;
+	int buf_len = 0;
+	int comma_cnt = 0;
+	int star_cnt = 0;
+	int iter = 0;
+	int star_pos = 0;
+
+	buf_len = he_strlen(nmea_databuf);
+
+	if( (buf_len >= NMEA_MIN_LEN) && (buf_len <= NMEA_MAX_LEN))
+	{
+		while(iter <= buf_len)
+		{
+			if(nmea_databuf[iter] == '*')
+			{ /*Take the position of * */
+				star_cnt++;
+				star_pos = iter;
+			}
+			else if(nmea_databuf[iter] == ',')
+			{
+				comma_cnt++;
+			}
+			iter++;
+		}
+
+		if(comma_cnt>=5 && star_cnt == 1)
+		{	/* check for star position in the buffer is valid   Used 5 considering 2 checksum char + \r\n at the end*/
+			if((buf_len - star_pos) >= 2 && (buf_len - star_pos) <= 4)
+			{
+				ret_sts = NMEA_VALID;
+			}
+		}
+	}
+
+#ifdef DEBUG
+	printf("FUNC--nmea_canbeparsed\nbuffer Length Received:  %d\n",buf_len);
+	printf("Fields of , in Buffer: %d\n",comma_cnt);
+	printf("Pos of * : %d\n",star_pos);
+	printf("Star count in data: %d\n",star_cnt);
+#endif
+	return ret_sts;
+}
+
+
 
 
 /**
@@ -33,7 +88,7 @@ int nmeatype_check(char *nmea_databuf)
 	{
 		for(itr = 0; itr < GPSIZE-1; itr++)
 		{
-			status = he_strcmp(&nmea_databuf[1],nmea_packname[itr],5);
+			status = he_strcmp_len(&nmea_databuf[1],nmea_packname[itr],5);
 			if(status)
 			{
 				nmeatype_id = itr+1;
@@ -66,19 +121,18 @@ int nmea_checksum(char *nmea_databuf)
 	}
 	checksum_ascii[0] = nmea_databuf[itr+1];
 	checksum_ascii[1] = nmea_databuf[itr+2];
-	printf("rec = %s\n",checksum_ascii);
 	checksum_rec  = he_a2hex(checksum_ascii);
 	if(checksum_rec == checksum_calc)
 	{
 #ifdef DEBUG
-		printf("CHECKSUM Match\n");
+		printf("FUNC--nmea_checksum\nCHECKSUM Match\n");
 #endif
 		return CHECKSUM_VALID;
 	}
 	else
 	{
 #ifdef DEBUG
-		printf("received  %x    calculated  %x\n",checksum_rec,checksum_calc);
+		printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_rec,checksum_calc);
 		printf("CHECKSUM MISMATCH\n");
 #endif
 		return CHECKSUM_INVALID;
@@ -722,4 +776,64 @@ void extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 			break;
 		}
 	}
+}
+
+int he_nmea_main(char *nmea_inputbuf, nmea_grp_type *nmea_outputbuf)
+{
+	int ptype;
+	int nmeabuf_sts = NMEA_INVALID;
+	printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
+	nmeabuf_sts = nmea_canbeparsed(nmea_inputbuf);
+	if( NMEA_VALID == nmeabuf_sts)
+	{
+		if(CHECKSUM_VALID == nmea_checksum(nmea_inputbuf))
+		{
+			ptype = nmeatype_check(nmea_inputbuf);
+			switch (ptype)
+			{
+			case GPGGA:
+				printf("GPGGA");
+				nmea_outputbuf->nmea_pkt_type = GPGGA;
+				extract_nmeaGPGGA(&nmea_outputbuf->nmea_data_grp.info_gpgga,nmea_inputbuf);
+				break;
+			case GPGSA:
+				printf("GPGSA");
+				nmea_outputbuf->nmea_pkt_type = GPGSA;
+				extract_nmeaGPGSA(&nmea_outputbuf->nmea_data_grp.info_gpgsa,nmea_inputbuf);
+				break;
+			case GPGSV:
+				printf("GPGSV");
+				nmea_outputbuf->nmea_pkt_type = GPGSV;
+				extract_nmeaGPGSV(&nmea_outputbuf->nmea_data_grp.info_gpgsv,nmea_inputbuf);
+				break;
+			case GPRMC:
+				printf("GPRMC");
+				nmea_outputbuf->nmea_pkt_type = GPRMC;
+				extract_nmeaGPRMC(&nmea_outputbuf->nmea_data_grp.info_gprmc,nmea_inputbuf);
+				break;
+			case GPVTG:
+				printf("GPVTG");
+				nmea_outputbuf->nmea_pkt_type = GPVTG;
+				extract_nmeaGPVTG(&nmea_outputbuf->nmea_data_grp.info_gpvtg,nmea_inputbuf);
+				break;
+			default:
+				nmea_outputbuf->nmea_pkt_type = GPNON;
+				nmeabuf_sts = NMEA_INVALID;
+				printf("error");
+				break;
+			}
+			fflush(stdout);
+		}
+		else
+		{
+			nmeabuf_sts = NMEA_INVALID;
+			printf("WRONG INPUT:  %s",nmea_inputbuf);
+		}
+	}
+	else
+	{
+		nmeabuf_sts = NMEA_INVALID;
+	}
+
+	return nmeabuf_sts;
 }
