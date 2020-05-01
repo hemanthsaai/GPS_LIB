@@ -158,6 +158,17 @@ typedef enum _nmeaPACKTYPE
 }nmeaPACKTYPE;
 
 /**
+ * Data type of NMEA fields
+ */
+typedef enum _nmea_datatype
+{
+	CHAR_VAL = 0x0,
+	INT_VAL,
+	DOUBLE_VAL
+}nmea_datatype;
+
+
+/**
  * GGA packet information structure (Global Positioning System Fix Data)
  */
 typedef struct _nmeaGPGGA
@@ -258,15 +269,17 @@ typedef struct _nmea_grp
 	nmeaPACKTYPE nmea_pkt_type;			/*Size:  8 bytes  */
 }nmea_grp_type;							/* Size of nmea_grp is 120 bytes */
 
-extern int 	nmeatype_check			(char *nmea_databuf);
-extern int 	nmea_checksum			(char *nmea_databuf);
-extern int 	nmea_canbeparsed		(char *nmea_databuf);
-extern void extract_nmeaGPGGA		(nmeaGPGGA * info_gpgga, char *nmea_databuf);
-extern void extract_nmeaGPGSA		(nmeaGPGSA *info_gpgsa,  char *nmea_databuf);
-extern void extract_nmeaGPGSV		(nmeaGPGSV *info_gpgsv,  char *nmea_databuf);
-extern void extract_nmeaGPRMC		(nmeaGPRMC *info_gprmc,  char *nmea_databuf);
-extern void extract_nmeaGPVTG		(nmeaGPVTG *info_gpvtg,  char *nmea_databuf);
-extern int 	he_nmea_main			(char *nmea_inputbuf,    nmea_grp_type *nmea_outputbuf);
+extern int 	nmeatype_check				(char *nmea_databuf);
+extern int 	nmea_checksum				(char *nmea_databuf);
+extern int 	nmea_canbeparsed			(char *nmea_databuf);
+extern int  extract_nmeaGPGGA			(nmeaGPGGA * info_gpgga, char *nmea_databuf);
+extern int  extract_nmeaGPGSA			(nmeaGPGSA *info_gpgsa,  char *nmea_databuf);
+extern int  extract_nmeaGPGSV			(nmeaGPGSV *info_gpgsv,  char *nmea_databuf);
+extern int  extract_nmeaGPRMC			(nmeaGPRMC *info_gprmc,  char *nmea_databuf);
+extern int  extract_nmeaGPVTG			(nmeaGPVTG *info_gpvtg,  char *nmea_databuf);
+extern int 	he_nmea_main				(char *nmea_inputbuf,    nmea_grp_type *nmea_outputbuf);
+extern int  nmea_datatype_isfieldvalid	(char *buf, nmea_datatype check);
+
 
 
 #endif /* HE_NMEA_LIB_H_ */
