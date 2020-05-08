@@ -31,8 +31,11 @@ char *Response[] = {//"$GPGGA,S,KDfh,klasdhas,dbfgiad,fhvoiadf,hoahg,fgo;arerong
 //char * nmea_databuf = "$GPGSV,2,2,08,05,05,185,80,06,05,230,80,07,05,275,80,08,05,320,80*71";
 char *nmea_databuf;
 
-
+#ifdef NMEA_AS_MAIN
 int main(void) {
+#else
+int nnmea_main(void){
+#endif
 
 	int nmea_sts = NMEA_INVALID;
 	nmea_grp_type nmea_data;

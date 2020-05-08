@@ -7,8 +7,7 @@
  Description : Redefined Standard Library
  ============================================================================
  */
-#include "../include/he_std.h"
-
+#include "..\include\he_std.h"
 
 /*
 *	Returns the hex value of string

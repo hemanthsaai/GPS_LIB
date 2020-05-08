@@ -9,6 +9,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/stdlib/src/subdir.mk
+-include src/restructure/subdir.mk
 -include src/nmea/src/subdir.mk
 -include src/nmea/subdir.mk
 -include subdir.mk

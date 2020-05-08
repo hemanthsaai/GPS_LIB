@@ -1,0 +1,62 @@
+typedef struct _em_alert_type
+{
+char 	pkt_hdr[4];			/* The unique identifier for all messages from VLT 							*/
+char 	msg_typ[3];			/* Message Types supported. Emergency Message (EMR) or Stop Message (SEM) 	*/
+char 	imei[16];			/* Unique ID of the Vehicle 												*/
+char 	pkt_typ[3];			/* NM – Normal Packet, SP – Stored Packet									*/
+char 	date_time[15];		/* DDMMYYYY HHMMSS 															*/
+char 	gps_vldty;			/* A – Valid, V – Invalid 													*/
+char 	lat[13];			/* Latitude in decimal degrees -  dd.mmmmmm format 							*/
+char 	lat_dir;			/* N – North, S – South														*/
+char 	lon[13];			/* Longitude in decimal degrees - dd.mmmmmm format 							*/
+char 	lon_dir;			/* E – East,  W – West														*/
+char	altitude[13];		/* Altitude in meters (above sea level) 									*/
+char	speed[7];			/* Speed of Vehicle as Calculated by GPS module in VLT. (in KM/HR)			*/
+char	distance[7];		/* Distance calculated from previous GPS data 								*/
+char	provider;			/* G - Fine GPS,  N - Coarse GPS or data from the network 					*/
+char	veh_reg_no[17];		/* Registration Number of the Vehicle 										*/
+char	crc[9];				/* The 32 bit checksum of all the characters from the header up
+								to the CRC field 														*/
+}em_alert_type;
+
+typedef struct
+{
+char 	pkt_hdr[4];			/* The unique identifier for all messages from VLT 							*/
+char 	msg_typ[3];			/* Message Types supported. Emergency Message (EMR) or Stop Message (SEM) 	*/
+char	firm_ver[6];		/* Version details of the Firmware used in EX.1.0.0 						*/
+char 	pkt_typ[3];			/* NR EA TA HP IN IF BD BR BL 												*/
+char	pkt_sts;			/* L=Live or H= History														*/
+char 	imei[16];			/* Unique ID of the Vehicle 												*/
+char	veh_reg_no[17];		/* Registration Number of the Vehicle 										*/
+char 	gps_vldty;			/* 1 – Valid, 0 – Invalid 													*/
+char	date[9];			/* DDMMYYYY																	*/
+char	time[9];			/* DDMMYYYY																	*/
+char 	lat[13];			/* Latitude in decimal degrees -  dd.mmmmmm format 							*/
+char 	lat_dir;			/* N – North, S – South														*/
+char 	lon[13];			/* Longitude in decimal degrees - dd.mmmmmm format 							*/
+char 	lon_dir;			/* E – East,  W – West														*/
+char	speed[7];			/* Speed of Vehicle as Calculated by GPS module in VLT. (in KM/HR)			*/
+char	heading[5];			/* Course over ground in degrees 											*/
+char	num_sat_fix[3];		/* Number of satellites available for fix 									*/
+char	altitude[13];		/* Altitude in meters (above sea level) 									*/
+char	pdop[4];			/* Positional dilution of precision 										*/
+char	hdop[4];			/* Horizontal dilution of precision 										*/
+char	nw_operator[7];		/* Name of Network Operator 												*/
+char	ignition;			/* 1= Ign On , 0 = Ign Off 													*/
+char	veh_bat_sts;		/* 0 = Vehicle Battery Disconnected 1= Vehicle Battery Reconnected			*/
+char	main_ip_volt[6];	/* Indicator showing source voltage in Volts.								*/
+char	int_bat_volt[6];	/* Indicator for Level of battery charge remaining							*/
+char	emer_sts;			/* 1= On , 0 = Off															*/
+char	tmpr_alert;			/* C = Cover Closed , O = Cover Open										*/
+char	gsm_strength[3];	/* Value Ranging from 0 – 31 												*/
+char	mcc[4];				/* Mobile Country Code														*/
+char	mnc[3];				/* Mobile Network Code														*/
+char	lac[5];				/* Location Area Code in HEX												*/
+char	cell_id[5];			/* GSM Cell ID																*/
+char	nmr[5];				/* Neighboring 4 cell ID along with their LAC and signal strength			*/
+char	dig_ip_sts[5];		/* 4 external digital inputs (Status of Input 1 to Input 4 (0=Off; 1=On))	*/
+char	dig_ip_sts[3];		/* 2 external digital output status (0=Off; 1=On)							*/
+char	frame_no[7];		/* Sequence Number of the messages (000001 to 999999)						*/
+char	checksum[9];		/* The 32 bit checksum of all the characters from the header up
+								to the CRC field 														*/
+};

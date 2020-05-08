@@ -15,5 +15,6 @@ C_DEPS :=
 SUBDIRS := \
 src/nmea \
 src/nmea/src \
+src/restructure \
 src/stdlib/src \
 
