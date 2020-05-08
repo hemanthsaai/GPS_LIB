@@ -10,10 +10,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-
-#include "he_nmea_lib.h"
-#include "he_std.h"
+#include "../nmea/include/he_nmea_lib.h"
+#include "../stdlib/include/he_std.h"
 
 char *command[] = {	"AT+QGNSSRD=GGA",
 					"AT+QGNSSRD=GSA",

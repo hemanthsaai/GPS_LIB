@@ -7,9 +7,8 @@
  Description : Ansi-style
  ============================================================================
  */
-#include "he_nmea_lib.h"
-
-#include "he_std.h"
+#include "../include/he_nmea_lib.h"
+#include "../../stdlib/include/he_std.h"
 #include <stdio.h>
 
 /*
