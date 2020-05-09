@@ -65,7 +65,7 @@ extern void 				read_GBL_INTR		(GBL_INTR_HNDLR *gbl_intr		);
 extern void					read_hwio_status	(HW_IO_STS 		*io_sts_frmHW	);
 extern void 				read_SD_CONSTS		(SDCARD_RAW 	*sdcard_consts	);
 extern APPLICATION_MODE 	prioritize_modes	(void							);
-
+extern void 				application_run		(APPLICATION_MODE curr_app_mode	);
 
 extern GBL_INTR_HNDLR gbl_intr;
 

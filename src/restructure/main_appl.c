@@ -13,9 +13,11 @@
 #include <unistd.h>
 #include "SW_DUMP_LIB.h"
 #include "..\stdlib\include\he_std.h"
+#include "..\nmea\include\he_nmea_lib.h"
 
 
 GBL_INTR_HNDLR gbl_intr;
+int timer_stub = 5;
 
 #ifdef APPL_AS_MAIN
 int main(void) {
@@ -29,7 +31,7 @@ int appl_header(void) {
 
 	while(1)
 	{
-		sleep(10);
+		sleep(5);
 	/* THIS is a interrupt simulator & don't use this on HARDWARE  */
 	read_GBL_INTR(&gbl_intr);
 
@@ -39,6 +41,18 @@ int appl_header(void) {
 	read_hwio_status(&io_sts_frmHW);
 
 	curr_app_mode = prioritize_modes();
+	application_run(curr_app_mode);
+
+	//puts("!!!PERFECT Hemanth!!!"); /* prints !!!Hello Hemanth!!! */
+	fflush(stdout);
+	}
+	return EXIT_SUCCESS;
+}
+
+void application_run(APPLICATION_MODE curr_app_mode)
+{
+
+
 	switch(curr_app_mode)
 	{
 	case EMERGENCY_MODE:
@@ -55,16 +69,10 @@ int appl_header(void) {
 		break;
 	case IGN_OFF_MODE:
 		printf("Starting Application in IGN_OFF_MODE\n");
+		nnmea_main();
 		break;
 	default:
 		printf("Starting Application in DEFAULT_MODE\n");
 		break;
 	}
-
-	//puts("!!!PERFECT Hemanth!!!"); /* prints !!!Hello Hemanth!!! */
-	fflush(stdout);
-	}
-	return EXIT_SUCCESS;
 }
-
-

@@ -280,6 +280,6 @@ extern int  extract_nmeaGPVTG			(nmeaGPVTG *info_gpvtg,  char *nmea_databuf);
 extern int 	he_nmea_main				(char *nmea_inputbuf,    nmea_grp_type *nmea_outputbuf);
 extern int  nmea_datatype_isfieldvalid	(char *buf, nmea_datatype check);
 
-
+extern  void nnmea_main(void);
 
 #endif /* HE_NMEA_LIB_H_ */
