@@ -253,19 +253,19 @@ typedef struct _nmeaGPVTG
 } nmeaGPVTG;
 
 
-typedef union _nmea_info_grp
+typedef struct _nmea_info_grp
 {
 	nmeaGPGGA info_gpgga;		/*Size: 112 bytes*/
 	nmeaGPGSA info_gpgsa;		/*Size: 80  bytes*/
 	nmeaGPGSV info_gpgsv;		/*Size: 76  bytes*/
 	nmeaGPRMC info_gprmc;		/*Size: 104 bytes*/
 	nmeaGPVTG info_gpvtg;		/*Size: 64  bytes*/
-}nmea_info_grp_type;			/*Total Size: 112 bytes*/
+}nmea_info_grp_type;			/*Total Size: 436 bytes*/
 
 
 typedef struct _nmea_grp
 {
-	nmea_info_grp_type nmea_data_grp;					/*Size:  112 bytes*/
+	nmea_info_grp_type nmea_info_grp;					/*Size:  112 bytes*/
 	nmeaPACKTYPE nmea_pkt_type;			/*Size:  8 bytes  */
 }nmea_grp_type;							/* Size of nmea_grp is 120 bytes */
 
@@ -277,9 +277,9 @@ extern int  extract_nmeaGPGSA			(nmeaGPGSA *info_gpgsa,  char *nmea_databuf);
 extern int  extract_nmeaGPGSV			(nmeaGPGSV *info_gpgsv,  char *nmea_databuf);
 extern int  extract_nmeaGPRMC			(nmeaGPRMC *info_gprmc,  char *nmea_databuf);
 extern int  extract_nmeaGPVTG			(nmeaGPVTG *info_gpvtg,  char *nmea_databuf);
-extern int 	he_nmea_main				(char *nmea_inputbuf,    nmea_grp_type *nmea_outputbuf);
+extern int 	he_nmea_process				(char *nmea_inputbuf,    nmea_info_grp_type *nmea_outputbuf);
 extern int  nmea_datatype_isfieldvalid	(char *buf, nmea_datatype check);
 
-extern  void nnmea_main(void);
+extern  int nmea_main(void);
 
 #endif /* HE_NMEA_LIB_H_ */

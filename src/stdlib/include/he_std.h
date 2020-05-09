@@ -13,6 +13,7 @@
 #define HE_STD_H_
 
 #define APPL_AS_MAIN
+//#define NMEA_AS_MAIN
 
 #define TRUE	1U
 #define FALSE	0U

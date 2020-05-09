@@ -69,7 +69,7 @@ void application_run(APPLICATION_MODE curr_app_mode)
 		break;
 	case IGN_OFF_MODE:
 		printf("Starting Application in IGN_OFF_MODE\n");
-		nnmea_main();
+		nmea_main();
 		break;
 	default:
 		printf("Starting Application in DEFAULT_MODE\n");

@@ -1446,7 +1446,7 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 	return nmea_vldty;
 }
 
-int he_nmea_main(char *nmea_inputbuf, nmea_grp_type *nmea_outputbuf)
+int he_nmea_process(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 {
 	int ptype;
 	int nmeabuf_sts = NMEA_INVALID;
@@ -1462,31 +1462,25 @@ int he_nmea_main(char *nmea_inputbuf, nmea_grp_type *nmea_outputbuf)
 			{
 			case GPGGA:
 				printf("GPGGA");
-				nmea_outputbuf->nmea_pkt_type = GPGGA;
-				nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->nmea_data_grp.info_gpgga,nmea_inputbuf);
+				nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
 				break;
 			case GPGSA:
 				printf("GPGSA");
-				nmea_outputbuf->nmea_pkt_type = GPGSA;
-				nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->nmea_data_grp.info_gpgsa,nmea_inputbuf);
+				nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
 				break;
 			case GPGSV:
 				printf("GPGSV");
-				nmea_outputbuf->nmea_pkt_type = GPGSV;
-				nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->nmea_data_grp.info_gpgsv,nmea_inputbuf);
+				nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
 				break;
 			case GPRMC:
 				printf("GPRMC");
-				nmea_outputbuf->nmea_pkt_type = GPRMC;
-				nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->nmea_data_grp.info_gprmc,nmea_inputbuf);
+				nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
 				break;
 			case GPVTG:
 				printf("GPVTG");
-				nmea_outputbuf->nmea_pkt_type = GPVTG;
-				nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->nmea_data_grp.info_gpvtg,nmea_inputbuf);
+				nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
 				break;
 			default:
-				nmea_outputbuf->nmea_pkt_type = GPNON;
 				nmeabuf_sts = NMEA_INVALID;
 				printf("error");
 				break;

@@ -32,7 +32,7 @@ int main(void) {
 
 
 	int nmea_sts = NMEA_INVALID;
-	nmea_grp_type nmea_data;
+	nmea_info_grp_type nmea_info_grp;
 	char Input[20];
 	scanf("%s",Input);
 	nmea_databuf = 0;
@@ -43,17 +43,15 @@ int main(void) {
 		if(he_strcmp(command[iter],Input))
 		{
 			nmea_databuf = Response[iter];
-			//printf("%s\n",Response[iter]);
 		}
 	}
 	printf("%s\n",nmea_databuf);
 	if(nmea_databuf)
 	{
-		nmea_sts = he_nmea_main(nmea_databuf,&nmea_data);
+		nmea_sts = he_nmea_process(nmea_databuf,&nmea_info_grp);
 		if(nmea_sts == NMEA_VALID)
 		{
 			printf("SUCCESS\n");
-			printf("%d\n",nmea_data.nmea_pkt_type);
 		}
 		else
 		{
@@ -69,14 +67,15 @@ int main(void) {
 }
 #else
 
-void nnmea_main(void){
+int nmea_main(void){
 	int nmea_sts = NMEA_INVALID;
-	nmea_grp_type nmea_data;
+	nmea_info_grp_type nmea_data;
 
 	for (int i = 0; i<=4; i++)
 	{
 		nmea_databuf = Response[i];
-		nmea_sts = he_nmea_main(nmea_databuf,&nmea_data);
+		nmea_sts = he_nmea_process(nmea_databuf,&nmea_data);
 	}
+	return nmea_sts;
 }
 #endif
