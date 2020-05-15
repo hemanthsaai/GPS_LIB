@@ -17,4 +17,5 @@ src/nmea \
 src/nmea/src \
 src/restructure \
 src/stdlib/src \
+src/stdlib/test \
 

@@ -1446,7 +1446,7 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 	return nmea_vldty;
 }
 
-int he_nmea_process(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
+int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 {
 	int ptype;
 	int nmeabuf_sts = NMEA_INVALID;
@@ -1498,5 +1498,13 @@ int he_nmea_process(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 		nmeabuf_sts = NMEA_INVALID;
 	}
 
+	return nmeabuf_sts;
+}
+
+int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
+{
+	int nmeabuf_sts = NMEA_INVALID;
+	he_f2a(nmea_data->info_gpgga.lat,nmea_data_str->lat,6);
+	printf("%lf  lat in string => %s\n BUG IN FLOAT FUNCTION\n ",nmea_data->info_gpgga.lat,nmea_data_str->lat);
 	return nmeabuf_sts;
 }

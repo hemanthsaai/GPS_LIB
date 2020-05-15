@@ -1,7 +1,7 @@
 #ifndef ALERTS_H_
 #define ALERTS_H_
 
-typedef struct _gps_data
+typedef struct _nmea_data_str
 {
 	char 	gps_vldty;			/* 1 – Valid, 0 – Invalid 													*/
 	char	date[9];			/* DDMMYYYY																	*/
@@ -16,9 +16,9 @@ typedef struct _gps_data
 	char	altitude[13];		/* Altitude in meters (above sea level) 									*/
 	char	pdop[4];			/* Positional dilution of precision 										*/
 	char	hdop[4];			/* Horizontal dilution of precision 										*/
-}GPS_DATA;
+}NMEA_DATA_STR;
 
-typedef struct _gsm_data_out
+typedef struct _gsm_data_STR
 {
 	char	nw_operator[7];		/* Name of Network Operator 												*/
 	char	gsm_strength[3];	/* Value Ranging from 0 – 31 												*/
@@ -27,9 +27,9 @@ typedef struct _gsm_data_out
 	char	lac[5];				/* Location Area Code in HEX												*/
 	char	cell_id[5];			/* GSM Cell ID																*/
 	char	nmr[5];				/* Neighboring 4 cell ID along with their LAC and signal strength			*/
-}GSM_DATA_OUT;
+}GSM_DATA_STR;
 
-typedef struct _veh_data_out
+typedef struct _veh_data_str
 {
 	char	veh_reg_no[17];		/* Registration Number of the Vehicle 										*/
 	char	ignition;			/* 1 = IGN On , 0 = IGN Off 												*/
@@ -39,19 +39,15 @@ typedef struct _veh_data_out
 	char	emer_btn_sts;		/* 1= On , 0 = Off															*/
 	char	dig_ip_sts[5];		/* 4 external digital inputs (Status of Input 1 to Input 4 (0=Off; 1=On))	*/
 	char	dig_op_sts[3];		/* 2 external digital output status (0=Off; 1=On)							*/
-}VEH_DATA_OUT;
+}VEH_DATA_STR;
 
-typedef struct _hw_data_out
+typedef struct _hw_data_str
 {
 	char 	imei[16];			/* Unique ID of the Vehicle 												*/
 	char 	pkt_hdr[4];			/* The unique identifier for all messages from VLT 							*/
 	char	firm_ver[6];		/* Version details of the Firmware used in EX.1.0.0 						*/
 	char	tmpr_alert;			/* C = Cover Closed , O = Cover Open										*/
-}HW_DATA_OUT;
-
-/************************************************************************************************************/
-/*					TODO:	MOVE FROM HERE THIS SECTION DO NOT BELONG TO ALERTS 							*/
-/************************************************************************************************************/
+}HW_DATA_STR;
 
 
 

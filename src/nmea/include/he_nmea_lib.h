@@ -11,6 +11,8 @@
 #ifndef HE_NMEA_LIB_H_
 #define HE_NMEA_LIB_H_
 
+#include "../../restructure/Alerts.h"
+
 #define DEBUG
 
 #define NMEA_INVALID		(0)
@@ -265,20 +267,22 @@ typedef struct _nmea_info_grp
 
 typedef struct _nmea_grp
 {
-	nmea_info_grp_type nmea_info_grp;					/*Size:  112 bytes*/
+	nmea_info_grp_type nmea_info_grp;					/*Size:  436 bytes*/
 	nmeaPACKTYPE nmea_pkt_type;			/*Size:  8 bytes  */
-}nmea_grp_type;							/* Size of nmea_grp is 120 bytes */
+}nmea_grp_type;							/* Size of nmea_grp is 444 bytes */
 
 extern int 	nmeatype_check				(char *nmea_databuf);
 extern int 	nmea_checksum				(char *nmea_databuf);
 extern int 	nmea_canbeparsed			(char *nmea_databuf);
-extern int  extract_nmeaGPGGA			(nmeaGPGGA * info_gpgga, char *nmea_databuf);
-extern int  extract_nmeaGPGSA			(nmeaGPGSA *info_gpgsa,  char *nmea_databuf);
-extern int  extract_nmeaGPGSV			(nmeaGPGSV *info_gpgsv,  char *nmea_databuf);
-extern int  extract_nmeaGPRMC			(nmeaGPRMC *info_gprmc,  char *nmea_databuf);
-extern int  extract_nmeaGPVTG			(nmeaGPVTG *info_gpvtg,  char *nmea_databuf);
-extern int 	he_nmea_process				(char *nmea_inputbuf,    nmea_info_grp_type *nmea_outputbuf);
-extern int  nmea_datatype_isfieldvalid	(char *buf, nmea_datatype check);
+extern int  extract_nmeaGPGGA			(nmeaGPGGA * info_gpgga,  char *nmea_databuf);
+extern int  extract_nmeaGPGSA			(nmeaGPGSA * info_gpgsa,  char *nmea_databuf);
+extern int  extract_nmeaGPGSV			(nmeaGPGSV * info_gpgsv,  char *nmea_databuf);
+extern int  extract_nmeaGPRMC			(nmeaGPRMC * info_gprmc,  char *nmea_databuf);
+extern int  extract_nmeaGPVTG			(nmeaGPVTG * info_gpvtg,  char *nmea_databuf);
+extern int  nmea_datatype_isfieldvalid	(char 	   * buf,         nmea_datatype check);
+
+extern int 	he_nmea_extract				(char *nmea_inputbuf,     		nmea_info_grp_type *nmea_outputbuf);
+extern int  he_nmea_process				(nmea_info_grp_type *nmea_data, NMEA_DATA_STR 	   *nmea_data_str);
 
 extern  int nmea_main(void);
 

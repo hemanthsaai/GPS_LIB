@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "../nmea/include/he_nmea_lib.h"
 #include "../stdlib/include/he_std.h"
+#include "../restructure/Alerts.h"
 
 char *command[] = {	"AT+QGNSSRD=GGA",
 					"AT+QGNSSRD=GSA",
@@ -70,11 +71,14 @@ int main(void) {
 int nmea_main(void){
 	int nmea_sts = NMEA_INVALID;
 	nmea_info_grp_type nmea_data;
+	NMEA_DATA_STR	nmea_data_str;
 
 	for (int i = 0; i<=4; i++)
 	{
 		nmea_databuf = Response[i];
-		nmea_sts = he_nmea_process(nmea_databuf,&nmea_data);
+		nmea_sts = he_nmea_extract(nmea_databuf,&nmea_data);
+		nmea_sts = he_nmea_process(&nmea_data,&nmea_data_str);
+
 	}
 	return nmea_sts;
 }

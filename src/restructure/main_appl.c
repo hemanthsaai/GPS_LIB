@@ -14,6 +14,7 @@
 #include "SW_DUMP_LIB.h"
 #include "..\stdlib\include\he_std.h"
 #include "..\nmea\include\he_nmea_lib.h"
+#include "..\stdlib\test\he_std_test.h"
 
 
 GBL_INTR_HNDLR gbl_intr;
@@ -29,9 +30,11 @@ int appl_header(void) {
 	SDCARD_RAW	consts_frm_sdcard;
 	APPLICATION_MODE curr_app_mode;
 
+	he_f2a_test();
+	return 0;
+
 	while(1)
 	{
-		sleep(5);
 	/* THIS is a interrupt simulator & don't use this on HARDWARE  */
 	read_GBL_INTR(&gbl_intr);
 
@@ -43,8 +46,9 @@ int appl_header(void) {
 	curr_app_mode = prioritize_modes();
 	application_run(curr_app_mode);
 
-	//puts("!!!PERFECT Hemanth!!!"); /* prints !!!Hello Hemanth!!! */
+	puts("!!!PERFECT Hemanth!!!"); /* prints !!!Hello Hemanth!!! */
 	fflush(stdout);
+	sleep(20);
 	}
 	return EXIT_SUCCESS;
 }
