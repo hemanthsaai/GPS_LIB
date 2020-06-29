@@ -10,7 +10,6 @@
 #include "../include/he_nmea_lib.h"
 #include "../../stdlib/include/he_std.h"
 #include <stdio.h>
-
 /*
  * Check if the nmea has * and ,
  * because after this all the functions consider the line ending as *
@@ -1100,7 +1099,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				/*
 				 *  Calculation is similar to Latitude
 				 */
-				if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
+				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 				{
 					doublebuf = he_a2f(buf_extract);
 					intbuf = (int) ( ((float)(doublebuf)/100) );
