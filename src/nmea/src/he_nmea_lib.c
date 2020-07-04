@@ -1480,8 +1480,8 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 				nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
 				break;
 			default:
-				nmeabuf_sts = NMEA_INVALID;
-				printf("error");
+				//nmeabuf_sts = NMEA_INVALID;
+				//printf("error");
 				break;
 			}
 			fflush(stdout);
@@ -1503,7 +1503,88 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 {
 	int nmeabuf_sts = NMEA_INVALID;
+
+	he_i2a(nmea_data->info_gpgga.sig,nmea_data_str->gps_vldty);
+//DATE
+	if(nmea_data->info_gprmc.date.day <= 9)
+	{
+		he_i2a(nmea_data->info_gprmc.date.day,&nmea_data_str->date[1]);
+		nmea_data_str->date[0] = 48;
+	}
+	else
+	{
+		he_i2a(nmea_data->info_gprmc.date.day,nmea_data_str->date);
+	}
+
+	if(nmea_data->info_gprmc.date.mon <= 9)
+	{
+		he_i2a(nmea_data->info_gprmc.date.mon,&nmea_data_str->date[3]);
+		nmea_data_str->date[2] = 48;
+	}
+	else
+	{
+		he_i2a(nmea_data->info_gprmc.date.mon,&nmea_data_str->date[2]);
+	}
+	he_i2a(nmea_data->info_gprmc.date.year,&nmea_data_str->date[4]);
+// TIME
+	if(nmea_data->info_gprmc.utc.hour <= 9)
+	{
+		he_i2a(nmea_data->info_gprmc.utc.hour,&nmea_data_str->time[1]);
+		nmea_data_str->time[0] = 48;
+	}
+	else
+	{
+		he_i2a(nmea_data->info_gprmc.utc.hour,nmea_data_str->time);
+	}
+	if(nmea_data->info_gprmc.utc.min <= 9)
+	{
+		he_i2a(nmea_data->info_gprmc.utc.min,&nmea_data_str->time[3]);
+		nmea_data_str->time[2] = 48;
+	}
+	else
+	{
+		he_i2a(nmea_data->info_gprmc.utc.min,&nmea_data_str->time[2]);
+	}
+	if(nmea_data->info_gprmc.utc.sec <= 9)
+	{
+		he_i2a(nmea_data->info_gprmc.utc.sec,&nmea_data_str->time[5]);
+		nmea_data_str->time[4] = 48;
+	}
+	else
+	{
+		he_i2a(nmea_data->info_gprmc.utc.sec,&nmea_data_str->time[4]);
+	}
+
+//LAT and LONG
 	he_f2a(nmea_data->info_gpgga.lat,nmea_data_str->lat,6);
-	printf("%lf  lat in string => %s\n BUG IN FLOAT FUNCTION\n ",nmea_data->info_gpgga.lat,nmea_data_str->lat);
+	nmea_data_str->lat_dir = nmea_data->info_gpgga.ns ;
+	he_f2a(nmea_data->info_gpgga.lon,nmea_data_str->lon,6);
+	nmea_data_str->lon_dir = nmea_data->info_gpgga.ew ;
+//SPEED
+	he_f2a(nmea_data->info_gpvtg.spk,nmea_data_str->speed,3);
+
+//SAT_COUNT
+	if(nmea_data->info_gpgsv.sat_count <= 9U)
+	{
+		he_i2a(nmea_data->info_gpgsv.sat_count,&nmea_data_str->num_sat_fix[1]);
+		nmea_data_str->num_sat_fix[0] = 48;
+	}
+	else
+	{
+		he_i2a(nmea_data->info_gpgsv.sat_count,nmea_data_str->num_sat_fix);
+	}
+
+//ALTITUDE
+	he_f2a(nmea_data->info_gpgga.elv,nmea_data_str->altitude,3);
+
+	printf("%s  GPS VALIDITY\n",nmea_data_str->gps_vldty);
+	printf("%s Date\n",nmea_data_str->date);
+	printf("%s Time\n",nmea_data_str->time);
+	printf("%lf  lat in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lat,nmea_data_str->lat,nmea_data_str->lat_dir);
+	printf("%lf  lon in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lon,nmea_data_str->lon,nmea_data_str->lon_dir);
+	printf("%lf  speed in string => %s \n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpvtg.spk,nmea_data_str->speed);
+	printf("%s SAT_COUNT\n",nmea_data_str->num_sat_fix);
+	printf("%s ALTITUDE\n",nmea_data_str->altitude);
 	return nmeabuf_sts;
+
 }

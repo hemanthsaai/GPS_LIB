@@ -77,9 +77,8 @@ int nmea_main(void){
 	{
 		nmea_databuf = Response[i];
 		nmea_sts = he_nmea_extract(nmea_databuf,&nmea_data);
-		nmea_sts = he_nmea_process(&nmea_data,&nmea_data_str);
-
 	}
+	nmea_sts = he_nmea_process(&nmea_data,&nmea_data_str);
 	return nmea_sts;
 }
 #endif

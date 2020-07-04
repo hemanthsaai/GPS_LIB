@@ -3,9 +3,9 @@
 
 typedef struct _nmea_data_str
 {
-	char 	gps_vldty;			/* 1 – Valid, 0 – Invalid 													*/
+	char 	gps_vldty[2];			/* 0 = Invalid; 1 = Fix; 2 = Differential, 3 = Sensitive  					*/
 	char	date[9];			/* DDMMYYYY																	*/
-	char	time[9];			/* DDMMYYYY																	*/
+	char	time[7];			/* HHMMSS																	*/
 	char 	lat[13];			/* Latitude in decimal degrees -  dd.mmmmmm format 							*/
 	char 	lat_dir;			/* N – North, S – South														*/
 	char 	lon[13];			/* Longitude in decimal degrees - dd.mmmmmm format 							*/

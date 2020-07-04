@@ -30,8 +30,8 @@ int appl_header(void) {
 	SDCARD_RAW	consts_frm_sdcard;
 	APPLICATION_MODE curr_app_mode;
 
-	he_f2a_test();
-	return 0;
+//	he_f2a_test();
+//	return 0;
 
 	while(1)
 	{
