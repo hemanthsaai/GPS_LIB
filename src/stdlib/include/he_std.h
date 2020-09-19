@@ -14,6 +14,12 @@
 
 #include <stdio.h>
 
+#ifdef DEBUG_ENABLED
+#define DEBUG if(1)
+#else
+#define DEBUG if(0)
+#endif
+
 #define APPL_AS_MAIN
 //#define NMEA_AS_MAIN
 
