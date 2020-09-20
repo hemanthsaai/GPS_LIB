@@ -10,7 +10,6 @@ int he_f2a_test(void)
 	double Test_input = FLOAT_ASCII_TEST_MIN;
 	char buf[20];
 	FILE *fptr;
-	int cnt = 0;
 
 	fptr = fopen("he_ftoa_test_results.log","w");
 	if(fptr <= 0)

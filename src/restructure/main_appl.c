@@ -20,7 +20,7 @@
 GBL_INTR_HNDLR gbl_intr;
 int timer_stub = 5;
 
-#ifdef APPL_AS_MAIN
+#ifdef NMEA_AS_MAIN
 int main(void) {
 #else
 int appl_header(void) {

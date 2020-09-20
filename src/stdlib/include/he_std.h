@@ -15,9 +15,9 @@
 #include <stdio.h>
 
 #ifdef DEBUG_ENABLED
-#define DEBUG if(1)
+#define __DEBUG if(1)
 #else
-#define DEBUG if(0)
+#define __DEBUG if(0)
 #endif
 
 #define APPL_AS_MAIN
@@ -41,5 +41,5 @@ extern int 		he_isanint0_9		(char * buf							);
 extern int 		he_isacharA_Z		(char   buf							);
 extern void 	he_reverse			(char * buf							);
 extern int 		he_powOfX			(int num, 	  int pow				);
-
+extern void 	he_f2a				(double num,  char* buf,    int len );
 #endif

@@ -54,10 +54,10 @@ int nmea_canbeparsed(char *nmea_databuf)
 	}
 
 
-	DEBUG printf("FUNC--nmea_canbeparsed\nbuffer Length Received:  %d\n",buf_len);
-	DEBUG printf("Fields of , in Buffer: %d\n",comma_cnt);
-	DEBUG printf("Pos of * : %d\n",star_pos);
-	DEBUG printf("Star count in data: %d\n",star_cnt);
+	__DEBUG printf("FUNC--nmea_canbeparsed\nbuffer Length Received:  %d\n",buf_len);
+	__DEBUG printf("Fields of , in Buffer: %d\n",comma_cnt);
+	__DEBUG printf("Pos of * : %d\n",star_pos);
+	__DEBUG printf("Star count in data: %d\n",star_cnt);
 
 	return ret_sts;
 }
@@ -147,13 +147,13 @@ int nmea_checksum(char *nmea_databuf)
 	checksum_rec  = he_a2hex(checksum_ascii);
 	if(checksum_rec == checksum_calc)
 	{
-		DEBUG printf("FUNC--nmea_checksum\nCHECKSUM Match\n");
+		__DEBUG printf("FUNC--nmea_checksum\nCHECKSUM Match\n");
 		return CHECKSUM_VALID;
 	}
 	else
 	{
-		DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_rec,checksum_calc);
-		DEBUG printf("CHECKSUM MISMATCH\n");
+		__DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_rec,checksum_calc);
+		__DEBUG printf("CHECKSUM MISMATCH\n");
 		return CHECKSUM_INVALID;
 	}
 
@@ -176,7 +176,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 
 	nmea_databuf = nmea_databuf + 7;
 
-	DEBUG printf("%s\n",nmea_databuf);
+	__DEBUG printf("%s\n",nmea_databuf);
 
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
@@ -207,7 +207,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->utc.min = he_a2i(charbuf);
 				he_strcpy(&buf_extract[4],charbuf,2);
 				info_gpgga->utc.sec = he_a2i(charbuf);
-				DEBUG printf("UTC    hh  %d  mm %d  ss %d\n",info_gpgga->utc.hour, info_gpgga->utc.min, info_gpgga->utc.sec);
+				__DEBUG printf("UTC    hh  %d  mm %d  ss %d\n",info_gpgga->utc.hour, info_gpgga->utc.min, info_gpgga->utc.sec);
 			}
 			else
 			{
@@ -215,7 +215,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->utc.min  	= 0;
 				info_gpgga->utc.sec		= 0;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("UTC   INVALID\n");
+				__DEBUG printf("UTC   INVALID\n");
 			}
 			break;
 		case 1:
@@ -235,7 +235,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				doublebuf = intbuf + (doublebuf/60);
 				info_gpgga->lat = doublebuf;
 
-				DEBUG printf("LAT  %f\n",info_gpgga->lat);
+				__DEBUG printf("LAT  %f\n",info_gpgga->lat);
 
 			}
 			else
@@ -243,7 +243,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->lat = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("LAT  INVALID\n");
+				__DEBUG printf("LAT  INVALID\n");
 
 			}
 			break;
@@ -252,7 +252,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->ns = buf_extract[0] ;
 
-				DEBUG printf("NS   %c\n",info_gpgga->ns);
+				__DEBUG printf("NS   %c\n",info_gpgga->ns);
 
 			}
 			else
@@ -260,7 +260,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->ns = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("NS  INVALID\n");
+				__DEBUG printf("NS  INVALID\n");
 
 			}
 			break;
@@ -276,7 +276,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				doublebuf = intbuf + (doublebuf/60);
 				info_gpgga->lon = doublebuf;
 
-				DEBUG printf("LON  %f\n",info_gpgga->lon);
+				__DEBUG printf("LON  %f\n",info_gpgga->lon);
 
 			}
 			else
@@ -284,7 +284,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->lon = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("LON  INVALID\n");
+				__DEBUG printf("LON  INVALID\n");
 
 			}
 			break;
@@ -293,7 +293,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->ew = buf_extract[0] ;
 
-				DEBUG printf("EW   %c\n",info_gpgga->ew);
+				__DEBUG printf("EW   %c\n",info_gpgga->ew);
 
 			}
 			else
@@ -301,7 +301,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->ew = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("EW  INVALID\n");
+				__DEBUG printf("EW  INVALID\n");
 
 			}
 			break;
@@ -310,7 +310,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->sig = he_a2i(buf_extract);
 
-				DEBUG printf("SIG  %d\n",info_gpgga->sig);
+				__DEBUG printf("SIG  %d\n",info_gpgga->sig);
 
 			}
 			else
@@ -318,7 +318,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->sig = 0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("SIG  INVALID\n");
+				__DEBUG printf("SIG  INVALID\n");
 
 			}
 			break;
@@ -327,7 +327,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->satinuse = he_a2i(buf_extract);
 
-				DEBUG printf("satinuse  %d\n",info_gpgga->satinuse);
+				__DEBUG printf("satinuse  %d\n",info_gpgga->satinuse);
 
 			}
 			else
@@ -335,7 +335,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->satinuse = 0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("satinuse  INVALID\n");
+				__DEBUG printf("satinuse  INVALID\n");
 
 			}
 			break;
@@ -344,7 +344,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->HDOP = he_a2f(buf_extract);
 
-				DEBUG printf("HDOP   %f\n",info_gpgga->HDOP);
+				__DEBUG printf("HDOP   %f\n",info_gpgga->HDOP);
 
 			}
 			else
@@ -352,7 +352,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->HDOP = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("HDOP  INVALID\n");
+				__DEBUG printf("HDOP  INVALID\n");
 
 			}
 			break;
@@ -361,7 +361,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->elv = he_a2f(buf_extract);
 
-				DEBUG printf("elv   %f\n",info_gpgga->elv);
+				__DEBUG printf("elv   %f\n",info_gpgga->elv);
 
 			}
 			else
@@ -369,7 +369,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->elv = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("elv  INVALID\n");
+				__DEBUG printf("elv  INVALID\n");
 
 			}
 			break;
@@ -378,7 +378,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->elv_units = buf_extract[0] ;
 
-			DEBUG printf("elv_units   %c\n",info_gpgga->elv_units);
+			__DEBUG printf("elv_units   %c\n",info_gpgga->elv_units);
 
 			}
 			else
@@ -386,7 +386,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->elv_units = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("elv_units  INVALID\n");
+				__DEBUG printf("elv_units  INVALID\n");
 
 			}
 			break;
@@ -395,7 +395,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->diff = he_a2f(buf_extract);
 
-				DEBUG printf("diff   %f\n",info_gpgga->diff);
+				__DEBUG printf("diff   %f\n",info_gpgga->diff);
 
 			}
 			else
@@ -403,7 +403,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->diff = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("diff  INVALID\n");
+				__DEBUG printf("diff  INVALID\n");
 
 			}
 			break;
@@ -412,7 +412,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->diff_units = buf_extract[0] ;
 
-				DEBUG printf("diff_units   %c\n",info_gpgga->diff_units);
+				__DEBUG printf("diff_units   %c\n",info_gpgga->diff_units);
 
 			}
 			else
@@ -420,7 +420,7 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->diff_units = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("diff_units  INVALID\n");
+				__DEBUG printf("diff_units  INVALID\n");
 
 			}
 			break;
@@ -441,12 +441,12 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		default:
 			nmea_vldty = NMEA_INVALID;
 
-			DEBUG printf("default");
+			__DEBUG printf("default");
 
 			break;
 		}
 
-		DEBUG printf(" \n");
+		__DEBUG printf(" \n");
 
 	}
 	return nmea_vldty;
@@ -465,7 +465,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 
 	nmea_databuf = nmea_databuf + 7;
 
-	DEBUG printf("%s\n",nmea_databuf);
+	__DEBUG printf("%s\n",nmea_databuf);
 
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
@@ -490,7 +490,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->fix_mode = buf_extract[0] ;
 
-				DEBUG printf("fix_mode   %c\n",info_gpgsa->fix_mode);
+				__DEBUG printf("fix_mode   %c\n",info_gpgsa->fix_mode);
 
 			}
 			else
@@ -498,7 +498,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->fix_mode = '0' ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("fix_mode   INVALID\n");
+				__DEBUG printf("fix_mode   INVALID\n");
 
 			}
 			break;
@@ -507,7 +507,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->fix_type = he_a2i(buf_extract);
 
-				DEBUG printf("fix_type  %d\n",info_gpgsa->fix_type);
+				__DEBUG printf("fix_type  %d\n",info_gpgsa->fix_type);
 
 			}
 			else
@@ -515,7 +515,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->fix_type = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("fix_type  INVALID\n");
+				__DEBUG printf("fix_type  INVALID\n");
 
 			}
 			break;
@@ -524,7 +524,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[0] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[0]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[0]);
 
 			}
 			else
@@ -532,7 +532,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[0] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -541,7 +541,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[1] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[1]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[1]);
 
 			}
 			else
@@ -549,7 +549,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[1] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -558,7 +558,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[2] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[2]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[2]);
 
 			}
 			else
@@ -566,7 +566,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[2] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -575,7 +575,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[3] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[3]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[3]);
 
 			}
 			else
@@ -583,7 +583,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[3] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -592,7 +592,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[4] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[4]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[4]);
 
 			}
 			else
@@ -600,7 +600,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[4] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -609,7 +609,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[5] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[5]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[5]);
 
 			}
 			else
@@ -617,7 +617,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[5] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -626,7 +626,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[6] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[6]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[6]);
 
 			}
 			else
@@ -634,7 +634,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[6] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -643,7 +643,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[7] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[7]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[7]);
 
 			}
 			else
@@ -651,7 +651,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[7] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -660,7 +660,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[8] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[8]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[8]);
 
 			}
 			else
@@ -668,7 +668,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[8] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -677,7 +677,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[9] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[9]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[9]);
 
 			}
 			else
@@ -685,7 +685,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[9] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -694,7 +694,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[10] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[10]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[10]);
 
 			}
 			else
@@ -702,7 +702,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[10] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -711,7 +711,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[11] = he_a2i(buf_extract);
 
-				DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[11]);
+				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[11]);
 
 			}
 			else
@@ -719,7 +719,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->sat_prn[11] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_prn  INVALID\n");
+				__DEBUG printf("sat_prn  INVALID\n");
 
 			}
 			break;
@@ -728,7 +728,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->PDOP = he_a2f(buf_extract);
 
-				DEBUG printf("PDOP   %f\n",info_gpgsa->PDOP);
+				__DEBUG printf("PDOP   %f\n",info_gpgsa->PDOP);
 
 			}
 			else
@@ -736,7 +736,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->PDOP = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("PDOP  INVALID\n");
+				__DEBUG printf("PDOP  INVALID\n");
 
 			}
 			break;
@@ -745,7 +745,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->HDOP = he_a2f(buf_extract);
 
-				DEBUG printf("HDOP   %f\n",info_gpgsa->HDOP);
+				__DEBUG printf("HDOP   %f\n",info_gpgsa->HDOP);
 
 			}
 			else
@@ -753,7 +753,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->HDOP = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("HDOP  INVALID\n");
+				__DEBUG printf("HDOP  INVALID\n");
 
 			}
 			break;
@@ -762,7 +762,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->VDOP = he_a2f(buf_extract);
 
-				DEBUG printf("VDOP   %f\n",info_gpgsa->VDOP);
+				__DEBUG printf("VDOP   %f\n",info_gpgsa->VDOP);
 
 			}
 			else
@@ -770,16 +770,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 				info_gpgsa->VDOP = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("VDOP  INVALID\n");
+				__DEBUG printf("VDOP  INVALID\n");
 
 			}
 			break;
 		default:
 			nmea_vldty = NMEA_INVALID;
 
-			DEBUG printf("default");
-			DEBUG printf("%c\n",nmea_databuf[itr0+1]);
-			DEBUG printf("-----%s\n",buf_extract);
+			__DEBUG printf("default");
+			__DEBUG printf("%c\n",nmea_databuf[itr0+1]);
+			__DEBUG printf("-----%s\n",buf_extract);
 
 			break;
 		}
@@ -835,7 +835,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->pack_count = he_a2i(buf_extract);
 
-				DEBUG printf("pack_count  %d\n",info_gpgsv->pack_count);
+				__DEBUG printf("pack_count  %d\n",info_gpgsv->pack_count);
 
 			}
 			else
@@ -843,7 +843,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->pack_count = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("pack_count INVALID\n");
+				__DEBUG printf("pack_count INVALID\n");
 
 			}
 			break;
@@ -852,7 +852,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->pack_index = he_a2i(buf_extract);
 
-				DEBUG printf("pack_index  %d\n",info_gpgsv->pack_index);
+				__DEBUG printf("pack_index  %d\n",info_gpgsv->pack_index);
 
 			}
 			else
@@ -860,7 +860,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->pack_index = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("pack_index INVALID\n");
+				__DEBUG printf("pack_index INVALID\n");
 
 			}
 			break;
@@ -869,7 +869,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_count = he_a2i(buf_extract);
 
-				DEBUG printf("sat_count  %d\n",info_gpgsv->sat_count);
+				__DEBUG printf("sat_count  %d\n",info_gpgsv->sat_count);
 
 			}
 			else
@@ -877,7 +877,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->sat_count = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_count INVALID\n");
+				__DEBUG printf("sat_count INVALID\n");
 
 			}
 			break;
@@ -886,7 +886,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].id = he_a2i(buf_extract);
 
-				DEBUG printf("sat_data[%d].id  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].id);
+				__DEBUG printf("sat_data[%d].id  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].id);
 
 			}
 			else
@@ -894,7 +894,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->sat_data[sat_data_idx].id = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_data[%d].id  INVALID\n",sat_data_idx);
+				__DEBUG printf("sat_data[%d].id  INVALID\n",sat_data_idx);
 
 			}
 			break;
@@ -903,7 +903,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].elv = he_a2i(buf_extract);
 
-				DEBUG printf("sat_data[%d].elv  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].elv);
+				__DEBUG printf("sat_data[%d].elv  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].elv);
 
 			}
 			else
@@ -911,7 +911,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->sat_data[sat_data_idx].elv = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_data[%d].elv  INVALID\n",sat_data_idx);
+				__DEBUG printf("sat_data[%d].elv  INVALID\n",sat_data_idx);
 
 			}
 			break;
@@ -920,7 +920,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].azimuth = he_a2i(buf_extract);
 
-				DEBUG printf("sat_data[%d].azimuth  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].azimuth);
+				__DEBUG printf("sat_data[%d].azimuth  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].azimuth);
 
 			}
 			else
@@ -928,7 +928,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->sat_data[sat_data_idx].azimuth = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_data[%d].azimuth  INVALID\n",sat_data_idx);
+				__DEBUG printf("sat_data[%d].azimuth  INVALID\n",sat_data_idx);
 
 			}
 			break;
@@ -937,7 +937,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].sig = he_a2i(buf_extract);
 
-				DEBUG printf("sat_data[%d].sig  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].sig);
+				__DEBUG printf("sat_data[%d].sig  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].sig);
 
 			}
 			else
@@ -945,20 +945,20 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 				info_gpgsv->sat_data[sat_data_idx].sig = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("sat_data[%d].sig  INVALID\n",sat_data_idx);
+				__DEBUG printf("sat_data[%d].sig  INVALID\n",sat_data_idx);
 
 			}
 			break;
 		default:
 			nmea_vldty = NMEA_INVALID;
 
-			DEBUG printf("GPGSV:  ERROR  %s\n",buf_extract);
+			__DEBUG printf("GPGSV:  ERROR  %s\n",buf_extract);
 
 			break;
 		}
 	}
 
-	DEBUG printf("GPGSV ERROR:  IMPLEMENTATION PENDING \nGPGSV has multiple packets this function handles only one packet\n");
+	__DEBUG printf("GPGSV ERROR:  IMPLEMENTATION PENDING \nGPGSV has multiple packets this function handles only one packet\n");
 	fflush(stdout);
 
 	return nmea_vldty;
@@ -1010,7 +1010,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					he_strcpy(&buf_extract[4],charbuf,2);
 					info_gprmc->utc.sec = he_a2i(charbuf);
 
-					DEBUG printf("\nUTC    hh  %d  mm %d  ss %d\n",info_gprmc->utc.hour, info_gprmc->utc.min, info_gprmc->utc.sec);
+					__DEBUG printf("\nUTC    hh  %d  mm %d  ss %d\n",info_gprmc->utc.hour, info_gprmc->utc.min, info_gprmc->utc.sec);
 
 				}
 				else
@@ -1020,7 +1020,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->utc.sec  = 0;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("UTC    INVALID\n");
+					__DEBUG printf("UTC    INVALID\n");
 
 				}
 				break;
@@ -1029,7 +1029,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->status = buf_extract[0] ;
 
-					DEBUG printf("status   %c\n",info_gprmc->status);
+					__DEBUG printf("status   %c\n",info_gprmc->status);
 
 				}
 				else
@@ -1037,7 +1037,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->status = '0' ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("status   INVALID\n");
+					__DEBUG printf("status   INVALID\n");
 
 				}
 				break;
@@ -1058,7 +1058,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					doublebuf = intbuf + (doublebuf/60);
 					info_gprmc->lat = doublebuf;
 
-					DEBUG printf("LAT  %f\n",info_gprmc->lat);
+					__DEBUG printf("LAT  %f\n",info_gprmc->lat);
 
 				}
 				else
@@ -1066,7 +1066,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->lat = 0.0 ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("LAT   INVALID\n");
+					__DEBUG printf("LAT   INVALID\n");
 
 				}
 				break;
@@ -1075,7 +1075,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->ns = buf_extract[0] ;
 
-					DEBUG printf("NS   %c\n",info_gprmc->ns);
+					__DEBUG printf("NS   %c\n",info_gprmc->ns);
 
 				}
 				else
@@ -1083,7 +1083,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->ns = '0' ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("NS   INVALID\n");
+					__DEBUG printf("NS   INVALID\n");
 
 				}
 				break;
@@ -1099,7 +1099,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					doublebuf = intbuf + (doublebuf/60);
 					info_gprmc->lon = doublebuf;
 
-					DEBUG printf("LON  %f\n",info_gprmc->lon);
+					__DEBUG printf("LON  %f\n",info_gprmc->lon);
 
 				}
 				else
@@ -1107,7 +1107,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->lon = 0.0 ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("LON  INVALID\n");
+					__DEBUG printf("LON  INVALID\n");
 
 				}
 				break;
@@ -1116,7 +1116,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->ew = buf_extract[0] ;
 
-					DEBUG printf("EW   %c\n",info_gprmc->ew);
+					__DEBUG printf("EW   %c\n",info_gprmc->ew);
 
 				}
 				else
@@ -1124,7 +1124,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->ew = '0' ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("EW   INVALID\n");
+					__DEBUG printf("EW   INVALID\n");
 
 				}
 				break;
@@ -1133,7 +1133,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->speed = he_a2f(buf_extract);
 
-					DEBUG printf("speed   %f\n",info_gprmc->speed);
+					__DEBUG printf("speed   %f\n",info_gprmc->speed);
 
 				}
 				else
@@ -1141,7 +1141,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->speed = 0.0 ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("speed   INVALID\n");
+					__DEBUG printf("speed   INVALID\n");
 
 				}
 				break;
@@ -1150,7 +1150,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->direction = he_a2f(buf_extract);
 
-					DEBUG printf("direction   %f\n",info_gprmc->direction);
+					__DEBUG printf("direction   %f\n",info_gprmc->direction);
 
 				}
 				else
@@ -1158,7 +1158,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->direction = he_a2f(buf_extract);
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("direction   INVALID\n");
+					__DEBUG printf("direction   INVALID\n");
 
 				}
 				break;
@@ -1173,7 +1173,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->date.year = he_a2i(charbuf);
 					info_gprmc->date.year = info_gprmc->date.year + 2000; // Year to be represented in YYYY hence adding 2000
 
-					DEBUG printf("DATE    dd  %d  mm %d  yy %d\n",info_gprmc->date.day, info_gprmc->date.mon, info_gprmc->date.year);
+					__DEBUG printf("DATE    dd  %d  mm %d  yy %d\n",info_gprmc->date.day, info_gprmc->date.mon, info_gprmc->date.year);
 
 				}
 				else
@@ -1183,7 +1183,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->date.year = 0;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("DATE   INVALID\n");
+					__DEBUG printf("DATE   INVALID\n");
 
 				}
 				break;
@@ -1192,7 +1192,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->declination = he_a2f(buf_extract);
 
-					DEBUG printf("declination   %f\n",info_gprmc->declination);
+					__DEBUG printf("declination   %f\n",info_gprmc->declination);
 
 				}
 				else
@@ -1200,7 +1200,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->declination = 0.0 ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("declination   INVAID\n");
+					__DEBUG printf("declination   INVAID\n");
 
 				}
 				break;
@@ -1209,7 +1209,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->declin_ew = buf_extract[0] ;
 
-					DEBUG printf("declin_ew   %c\n",info_gprmc->declin_ew);
+					__DEBUG printf("declin_ew   %c\n",info_gprmc->declin_ew);
 
 				}
 				else
@@ -1217,7 +1217,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->declin_ew = '0' ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("declin_ew   INVALID\n");
+					__DEBUG printf("declin_ew   INVALID\n");
 
 				}
 				break;
@@ -1226,7 +1226,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				{
 					info_gprmc->mode = buf_extract[0] ;
 
-					DEBUG printf("mode   %c\n",info_gprmc->mode);
+					__DEBUG printf("mode   %c\n",info_gprmc->mode);
 
 				}
 				else
@@ -1234,15 +1234,15 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 					info_gprmc->mode = '0' ;
 					nmea_vldty = NMEA_INVALID;
 
-					DEBUG printf("mode   INVALID\n");
+					__DEBUG printf("mode   INVALID\n");
 
 				}
 				break;
 			default:
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("\ngprmc:  error\n");
-				DEBUG printf("buffer @ error is : %s\n",buf_extract);
+				__DEBUG printf("\ngprmc:  error\n");
+				__DEBUG printf("buffer @ error is : %s\n",buf_extract);
 
 				break;
 		}
@@ -1295,7 +1295,7 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 			{
 				info_gpvtg->dir = he_a2f(buf_extract);
 
-				DEBUG printf("dir   %f\n",info_gpvtg->dir);
+				__DEBUG printf("dir   %f\n",info_gpvtg->dir);
 
 			}
 			else
@@ -1303,7 +1303,7 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 				info_gpvtg->dir = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				DEBUG printf("dir  INVALID\n");
+				__DEBUG printf("dir  INVALID\n");
 
 			}
 			break;
@@ -1312,97 +1312,97 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 			{
 				info_gpvtg->dir_t = buf_extract[0] ;
 
-				DEBUG printf("dir_t   %c\n",info_gpvtg->dir_t);
+				__DEBUG printf("dir_t   %c\n",info_gpvtg->dir_t);
 
 			}
 			else
 			{
 				info_gpvtg->dir_t = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("dir_t  INVALID\n");
+				__DEBUG printf("dir_t  INVALID\n");
 			}
 			break;
 		case 3:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				info_gpvtg->dec = he_a2f(buf_extract);
-				DEBUG printf("dec   %f\n",info_gpvtg->dec);
+				__DEBUG printf("dec   %f\n",info_gpvtg->dec);
 			}
 			else
 			{
 				info_gpvtg->dec = 0.0;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("dec  INVALID\n");
+				__DEBUG printf("dec  INVALID\n");
 			}
 			break;
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
 				info_gpvtg->dec_m = buf_extract[0] ;
-				DEBUG printf("dec_m   %c\n",info_gpvtg->dec_m);
+				__DEBUG printf("dec_m   %c\n",info_gpvtg->dec_m);
 			}
 			else
 			{
 				info_gpvtg->dec_m = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("dec_m  INVALID\n");
+				__DEBUG printf("dec_m  INVALID\n");
 			}
 			break;
 		case 5:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				info_gpvtg->spn = he_a2f(buf_extract);
-				DEBUG printf("spn   %f\n",info_gpvtg->spn);
+				__DEBUG printf("spn   %f\n",info_gpvtg->spn);
 			}
 			else
 			{
 				info_gpvtg->spn = 0.0;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("spn  INVALID\n");
+				__DEBUG printf("spn  INVALID\n");
 			}
 			break;
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
 				info_gpvtg->spn_n = buf_extract[0] ;
-				DEBUG printf("spn_n   %c\n",info_gpvtg->spn_n);
+				__DEBUG printf("spn_n   %c\n",info_gpvtg->spn_n);
 			}
 			else
 			{
 				info_gpvtg->spn_n = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("spn_n  INVALID\n");
+				__DEBUG printf("spn_n  INVALID\n");
 			}
 			break;
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				info_gpvtg->spk = he_a2f(buf_extract);
-				DEBUG printf("spk   %f\n",info_gpvtg->spk);
+				__DEBUG printf("spk   %f\n",info_gpvtg->spk);
 			}
 			else
 			{
 				info_gpvtg->spk = 0.0;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("spk  INVALID\n");
+				__DEBUG printf("spk  INVALID\n");
 			}
 			break;
 		case 8:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
 				info_gpvtg->spk_k = buf_extract[0] ;
-				DEBUG printf("spk_k   %c\n",info_gpvtg->spk_k);
+				__DEBUG printf("spk_k   %c\n",info_gpvtg->spk_k);
 			}
 			else
 			{
 				info_gpvtg->spk_k = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				DEBUG printf("spk_k  INVALID\n");
+				__DEBUG printf("spk_k  INVALID\n");
 			}
 			break;
 		default:
 			nmea_vldty = NMEA_INVALID;
-			DEBUG printf("\ngpvtg:  NMEA_INVALID\n");
+			__DEBUG printf("\ngpvtg:  NMEA_INVALID\n");
 			break;
 		}
 	}
@@ -1413,39 +1413,39 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 {
 	int ptype;
 	int nmeabuf_sts = NMEA_INVALID;
-	DEBUG printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
+	__DEBUG printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
 	nmeabuf_sts = nmea_canbeparsed(nmea_inputbuf);
 	if( NMEA_VALID == nmeabuf_sts)
 	{
 		if(CHECKSUM_VALID == nmea_checksum(nmea_inputbuf))
 		{
 			ptype = nmeatype_check(nmea_inputbuf);
-			DEBUG printf("ptype   %d\n",ptype);
+			__DEBUG printf("ptype   %d\n",ptype);
 			switch (ptype)
 			{
 			case GPGGA:
-				DEBUG printf("GPGGA");
+				__DEBUG printf("GPGGA");
 				nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
 				break;
 			case GPGSA:
-				DEBUG printf("GPGSA");
+				__DEBUG printf("GPGSA");
 				nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
 				break;
 			case GPGSV:
-				DEBUG printf("GPGSV");
+				__DEBUG printf("GPGSV");
 				nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
 				break;
 			case GPRMC:
-				DEBUG printf("GPRMC");
+				__DEBUG printf("GPRMC");
 				nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
 				break;
 			case GPVTG:
-				DEBUG printf("GPVTG");
+				__DEBUG printf("GPVTG");
 				nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
 				break;
 			default:
 				nmeabuf_sts = NMEA_INVALID;
-				DEBUG printf("error");
+				__DEBUG printf("error");
 				break;
 			}
 			fflush(stdout);
@@ -1453,7 +1453,7 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 		else
 		{
 			nmeabuf_sts = NMEA_INVALID;
-			DEBUG printf("WRONG INPUT:  %s",nmea_inputbuf);
+			__DEBUG printf("WRONG INPUT:  %s",nmea_inputbuf);
 		}
 	}
 	else
@@ -1541,14 +1541,14 @@ int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 //ALTITUDE
 	he_f2a(nmea_data->info_gpgga.elv,nmea_data_str->altitude,3);
 
-	DEBUG printf("%s  GPS VALIDITY\n",nmea_data_str->gps_vldty);
-	DEBUG printf("%s Date\n",nmea_data_str->date);
-	DEBUG printf("%s Time\n",nmea_data_str->time);
-	DEBUG printf("%lf  lat in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lat,nmea_data_str->lat,nmea_data_str->lat_dir);
-	DEBUG printf("%lf  lon in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lon,nmea_data_str->lon,nmea_data_str->lon_dir);
-	DEBUG printf("%lf  speed in string => %s \n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpvtg.spk,nmea_data_str->speed);
-	DEBUG printf("%s SAT_COUNT\n",nmea_data_str->num_sat_fix);
-	DEBUG printf("%s ALTITUDE\n",nmea_data_str->altitude);
+	__DEBUG printf("%s  GPS VALIDITY\n",nmea_data_str->gps_vldty);
+	__DEBUG printf("%s Date\n",nmea_data_str->date);
+	__DEBUG printf("%s Time\n",nmea_data_str->time);
+	__DEBUG printf("%lf  lat in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lat,nmea_data_str->lat,nmea_data_str->lat_dir);
+	__DEBUG printf("%lf  lon in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lon,nmea_data_str->lon,nmea_data_str->lon_dir);
+	__DEBUG printf("%lf  speed in string => %s \n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpvtg.spk,nmea_data_str->speed);
+	__DEBUG printf("%s SAT_COUNT\n",nmea_data_str->num_sat_fix);
+	__DEBUG printf("%s ALTITUDE\n",nmea_data_str->altitude);
 	return nmeabuf_sts;
 
 }

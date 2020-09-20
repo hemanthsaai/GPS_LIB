@@ -11,8 +11,7 @@
 #ifndef HE_NMEA_LIB_H_
 #define HE_NMEA_LIB_H_
 
-#include "/cygdrive/c/Users/heman/eclipse-workspace/GPS_LIB\src\restructure\Alerts.h"
-#define DEBUG_ENABLED
+#include "Alerts.h"
 
 #define NMEA_INVALID		(0)
 #define NMEA_VALID 			(1)

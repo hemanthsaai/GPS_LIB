@@ -14,6 +14,6 @@
 #define FLOAT_ASCII_TEST_MAX  180.000000
 
 extern int he_f2a_test(void);
-
+extern void he_f2a(double num, char* buf, int len);
 
 #endif /* SRC_STDLIB_TEST_HE_STD_TEST_H_ */
