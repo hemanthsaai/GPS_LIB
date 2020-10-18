@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 
+#define DEBUG_ENABLED
+
 #ifdef DEBUG_ENABLED
 #define __DEBUG if(1)
 #else

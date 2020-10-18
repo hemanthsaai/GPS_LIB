@@ -19,7 +19,7 @@
 
 GBL_INTR_HNDLR gbl_intr;
 int timer_stub = 5;
-
+#define NMEA_AS_MAIN
 #ifdef NMEA_AS_MAIN
 int main(void) {
 #else

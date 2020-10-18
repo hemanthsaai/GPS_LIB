@@ -92,13 +92,15 @@ int nmea_datatype_isfieldvalid(char *buf, nmea_datatype check)
 
 /**
  * \brief Check the received packet type
+ *  GPGGA/GSA/GSV/RMC/VTG
  * @return Received packet type
  * @see nmeaPACKTYPE
  */
 
-int nmeatype_check(char *nmea_databuf)
+int nmea_typecheck(char *nmea_databuf)
 {
-	int nmeatype_id, itr, status;
+	int nmeatype_id =  GPNON;
+	int itr, status;
 	char * nmea_packname[] = {
 			"GPGGA",
 			"GPGSA",
@@ -107,56 +109,76 @@ int nmeatype_check(char *nmea_databuf)
 			"GPVTG"
 	};
 
-	if(nmea_databuf[0] == '$')
+	/* Iterate through the predefined nmea_packname and check for Matching packtype */
+	for(itr = 0; itr < GPSIZE-1; itr++)
 	{
-		for(itr = 0; itr < GPSIZE-1; itr++)
+		status = he_strcmp_len(&nmea_databuf[1],nmea_packname[itr],5);
+		if(status)
 		{
-			status = he_strcmp_len(&nmea_databuf[1],nmea_packname[itr],5);
-			if(status)
-			{
-				nmeatype_id = itr+1;
-				return nmeatype_id;
-			}
-
+			/* Found the packet type, update the id and break the loop */
+			nmeatype_id = itr+1;
+			break;
 		}
+		else
+		{
+			/* Not Matched, Continue to next */
+		}
+
 	}
-	nmeatype_id = GPNON;
+
 	return nmeatype_id;
 }
 
 
 /**
  * \brief Check the checksum of received packet
+ *  Performs Software Calculation of Checksum.
+ *  XOR of entire received buffer compared to received checksum
+ *  which is at end of the same buffer
+ *
  * @return CHECKSUM_VALID if checksum is valid else CHECKSUM_INVALID
- * @see nmeaPACKTYPE
+ * @see checksum_status
  */
-int nmea_checksum(char *nmea_databuf)
+int nmea_checksum(char *nmea_databuf, int nmea_endmarker)
 {
-	int itr = 0;
-	int checksum_rec = 0;
-	int checksum_calc = 0;
+	int itr = 1;  /* 1 bcz Skip the $ at start of buffer*/
+	int checksum_received = 0;
+	int checksum_calculated = 0;
 	char checksum_ascii[3] = {0};
-	nmea_databuf++;
-	while(nmea_databuf[itr] != '*')
+	int checksum_status = CHECKSUM_INVALID;
+
+	if (NMEA_INVALID != nmea_endmarker)
 	{
-		checksum_calc ^= nmea_databuf[itr];
-		itr = itr + 1;
-	}
-	checksum_ascii[0] = nmea_databuf[itr+1];
-	checksum_ascii[1] = nmea_databuf[itr+2];
-	checksum_rec  = he_a2hex(checksum_ascii);
-	if(checksum_rec == checksum_calc)
-	{
-		__DEBUG printf("FUNC--nmea_checksum\nCHECKSUM Match\n");
-		return CHECKSUM_VALID;
+		/*Loop till end of buffer and calculate the checksum*/
+		while( itr < nmea_endmarker - 1 )
+		{
+			checksum_calculated ^= nmea_databuf[itr];
+			itr = itr + 1;
+		}
+		/*Extract the received checksum at end of buffer and convert it to hex*/
+		checksum_ascii[0] = nmea_databuf[itr+1];
+		checksum_ascii[1] = nmea_databuf[itr+2];
+		checksum_received  = he_a2hex(checksum_ascii);
+
+		if(checksum_received == checksum_calculated)
+		{
+			/*Valid Checksum is received, update status to valid*/
+			__DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_received,checksum_calculated);
+			__DEBUG printf("CHECKSUM Match\n");
+			checksum_status = CHECKSUM_VALID;
+		}
+		else
+		{
+			__DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_received,checksum_calculated);
+			__DEBUG printf("CHECKSUM MISMATCH\n");
+		}
 	}
 	else
 	{
-		__DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_rec,checksum_calc);
-		__DEBUG printf("CHECKSUM MISMATCH\n");
-		return CHECKSUM_INVALID;
+		__DEBUG printf("FUNC--nmea_checksum\nInvalid EndMarker received\n");
 	}
 
+	return checksum_status;
 }
 
 
@@ -1409,56 +1431,99 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 	return nmea_vldty;
 }
 
-int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
+/**
+ * \brief Find the valid end of the buffer which is *,
+ *  else return a dirty marker indicating the received buffer is invalid
+ * @return nmea_endmarker
+ */
+int nmea_FindEndMarker_validity(char *nmea_inputbuf)
 {
-	int ptype;
-	int nmeabuf_sts = NMEA_INVALID;
-	__DEBUG printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
-	nmeabuf_sts = nmea_canbeparsed(nmea_inputbuf);
-	if( NMEA_VALID == nmeabuf_sts)
+	int nmea_endmarker = NMEA_INVALID;
+	int itr = 0;
+
+	if ( '$' == nmea_inputbuf[itr] )
 	{
-		if(CHECKSUM_VALID == nmea_checksum(nmea_inputbuf))
+		/*Loop until the NMEA max limit set by Software or till end of string \0 */
+		while( (itr <= NMEA_MAX_LEN) && (nmea_inputbuf[itr] != '\0') )
 		{
-			ptype = nmeatype_check(nmea_inputbuf);
-			__DEBUG printf("ptype   %d\n",ptype);
-			switch (ptype)
+			/*when we get * in the buffer indicating valid buffer and end of string */
+			if (nmea_inputbuf[itr] == '*')
 			{
-			case GPGGA:
-				__DEBUG printf("GPGGA");
-				nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
-				break;
-			case GPGSA:
-				__DEBUG printf("GPGSA");
-				nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
-				break;
-			case GPGSV:
-				__DEBUG printf("GPGSV");
-				nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
-				break;
-			case GPRMC:
-				__DEBUG printf("GPRMC");
-				nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
-				break;
-			case GPVTG:
-				__DEBUG printf("GPVTG");
-				nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
-				break;
-			default:
-				nmeabuf_sts = NMEA_INVALID;
-				__DEBUG printf("error");
+				nmea_endmarker = itr + 1;   /* Put +1 as in upcoming functions check until < nmea_endmarker  and not <= nmea_endmarker */
 				break;
 			}
-			fflush(stdout);
+			else
+			{
+				/*Nothing valid found, just continue the loop*/
+				itr++;
+			}
+		}
+
+		if (nmea_endmarker)
+		{
+			__DEBUG printf("NMEA is Valid and can be parsed\n EndMarker set at : %d\n",nmea_endmarker);
 		}
 		else
 		{
-			nmeabuf_sts = NMEA_INVALID;
-			__DEBUG printf("WRONG INPUT:  %s",nmea_inputbuf);
+			__DEBUG printf("NMEA is InValid and cannot be parsed\n");
 		}
 	}
 	else
 	{
+		__DEBUG printf("NMEA is InValid and cannot be parsed\n");
+		/* Invalid Data buffer, Do Nothing*/
+	}
+
+	return nmea_endmarker;
+}
+
+int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
+{
+	int ptype;
+	int nmea_endmarker = NMEA_INVALID;
+	int nmeabuf_sts    = NMEA_INVALID;
+	__DEBUG printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
+
+	/*Check if the buffer is valid, get the valid end marker*/
+	nmea_endmarker = nmea_FindEndMarker_validity(nmea_inputbuf);
+
+	if(NMEA_INVALID != nmea_checksum(nmea_inputbuf, nmea_endmarker))
+	{
+		ptype = nmea_typecheck(nmea_inputbuf);
+		__DEBUG printf("ptype   %d\n",ptype);
+		switch (ptype)
+		{
+		case GPGGA:
+			__DEBUG printf("GPGGA");
+			nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
+			break;
+		case GPGSA:
+			__DEBUG printf("GPGSA");
+			nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
+			break;
+		case GPGSV:
+			__DEBUG printf("GPGSV");
+			nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
+			break;
+		case GPRMC:
+			__DEBUG printf("GPRMC");
+			nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
+			break;
+		case GPVTG:
+			__DEBUG printf("GPVTG");
+			nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
+			break;
+		default:
+			nmeabuf_sts = NMEA_INVALID;
+			__DEBUG printf("error");
+			break;
+		}
+		fflush(stdout);
+	}
+	else
+	{
 		nmeabuf_sts = NMEA_INVALID;
+		__DEBUG printf("WRONG INPUT:  %s\n",nmea_inputbuf);
 	}
 
 	return nmeabuf_sts;

@@ -11,7 +11,7 @@
 #ifndef HE_NMEA_LIB_H_
 #define HE_NMEA_LIB_H_
 
-#include "Alerts.h"
+#include "/cygdrive/c/Users/heman/eclipse-workspace/GPS_LIB\src\restructure\Alerts.h"
 
 #define NMEA_INVALID		(0)
 #define NMEA_VALID 			(1)
@@ -269,9 +269,9 @@ typedef struct _nmea_grp
 	nmeaPACKTYPE nmea_pkt_type;			/*Size:  8 bytes  */
 }nmea_grp_type;							/* Size of nmea_grp is 444 bytes */
 
-extern int 	nmeatype_check				(char *nmea_databuf);
-extern int 	nmea_checksum				(char *nmea_databuf);
-extern int 	nmea_canbeparsed			(char *nmea_databuf);
+int  nmea_typecheck						(char * nmea_databuf   );
+int  nmea_FindEndMarker_validity		(char * nmea_inputbuf  );
+extern int 	nmea_checksum				(char * nmea_databuf,     int   nmea_endmarker);
 extern int  extract_nmeaGPGGA			(nmeaGPGGA * info_gpgga,  char *nmea_databuf);
 extern int  extract_nmeaGPGSA			(nmeaGPGSA * info_gpgsa,  char *nmea_databuf);
 extern int  extract_nmeaGPGSV			(nmeaGPGSV * info_gpgsv,  char *nmea_databuf);
