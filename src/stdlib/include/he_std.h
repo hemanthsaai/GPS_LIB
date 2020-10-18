@@ -12,15 +12,12 @@
 #ifndef HE_STD_H_
 #define HE_STD_H_
 
+#define DEBUG
+
+#ifdef DEBUG
 #include <stdio.h>
-
-#define DEBUG_ENABLED
-
-#ifdef DEBUG_ENABLED
-#define __DEBUG if(1)
-#else
-#define __DEBUG if(0)
 #endif
+
 
 #define APPL_AS_MAIN
 //#define NMEA_AS_MAIN

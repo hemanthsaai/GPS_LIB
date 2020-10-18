@@ -37,25 +37,25 @@ void read_hwio_status(HW_IO_STS *io_sts_frmHW)
 	{
 		printf("FILE OPENED HW_data.log\n");
 		fscanf(hw_file_ptr, "%d%d%d%d%d%d%d%d%d%d",&io_sts_frmHW->veh_ign_sts,
-											  &io_sts_frmHW->veh_bat_sts,
-											  &io_sts_frmHW->eme_btn_sts,
-											  &io_sts_frmHW->dev_tmp_alt,
-											  &io_sts_frmHW->dig_ip_sts_0,
-											  &io_sts_frmHW->dig_ip_sts_1,
-											  &io_sts_frmHW->dig_ip_sts_2,
-											  &io_sts_frmHW->dig_ip_sts_3,
-											  &io_sts_frmHW->dig_op_sts_0,
-											  &io_sts_frmHW->dig_op_sts_1);
+				&io_sts_frmHW->veh_bat_sts,
+				&io_sts_frmHW->eme_btn_sts,
+				&io_sts_frmHW->dev_tmp_alt,
+				&io_sts_frmHW->dig_ip_sts_0,
+				&io_sts_frmHW->dig_ip_sts_1,
+				&io_sts_frmHW->dig_ip_sts_2,
+				&io_sts_frmHW->dig_ip_sts_3,
+				&io_sts_frmHW->dig_op_sts_0,
+				&io_sts_frmHW->dig_op_sts_1);
 		printf("%d %d %d %d %d %d %d %d %d %d\n",io_sts_frmHW->veh_ign_sts,
-				  io_sts_frmHW->veh_bat_sts,
-				  io_sts_frmHW->eme_btn_sts,
-				  io_sts_frmHW->dev_tmp_alt,
-				  io_sts_frmHW->dig_ip_sts_0,
-				  io_sts_frmHW->dig_ip_sts_1,
-				  io_sts_frmHW->dig_ip_sts_2,
-				  io_sts_frmHW->dig_ip_sts_3,
-				  io_sts_frmHW->dig_op_sts_0,
-				  io_sts_frmHW->dig_op_sts_1);
+				io_sts_frmHW->veh_bat_sts,
+				io_sts_frmHW->eme_btn_sts,
+				io_sts_frmHW->dev_tmp_alt,
+				io_sts_frmHW->dig_ip_sts_0,
+				io_sts_frmHW->dig_ip_sts_1,
+				io_sts_frmHW->dig_ip_sts_2,
+				io_sts_frmHW->dig_ip_sts_3,
+				io_sts_frmHW->dig_op_sts_0,
+				io_sts_frmHW->dig_op_sts_1);
 		fflush(stdout);
 		fclose(hw_file_ptr);
 	}
@@ -87,13 +87,13 @@ void read_SD_CONSTS(SDCARD_RAW *sdcard_consts)
 	{
 		printf("FILE OPENED SDcard_CONSTANTS.log\n");
 		fscanf(sdcard_file_ptr, "%s %s %s %s",sdcard_consts->veh_reg_no,
-										  sdcard_consts->imei,
-										  sdcard_consts->pkt_hdr,
-										  sdcard_consts->firm_ver);
+				sdcard_consts->imei,
+				sdcard_consts->pkt_hdr,
+				sdcard_consts->firm_ver);
 		printf("%s %s %s %s\n",sdcard_consts->veh_reg_no,
-				  sdcard_consts->imei,
-				  sdcard_consts->pkt_hdr,
-				  sdcard_consts->firm_ver);
+				sdcard_consts->imei,
+				sdcard_consts->pkt_hdr,
+				sdcard_consts->firm_ver);
 		fflush(stdout);
 		fclose(sdcard_file_ptr);
 	}

@@ -9,7 +9,10 @@
  */
 #include "../include/he_nmea_lib.h"
 #include "../../stdlib/include/he_std.h"
+#ifdef DEBUG
 #include <stdio.h>
+#endif
+
 /*
  * Check if the nmea has * and ,
  * because after this all the functions consider the line ending as *
@@ -54,10 +57,12 @@ int nmea_canbeparsed(char *nmea_databuf)
 	}
 
 
-	__DEBUG printf("FUNC--nmea_canbeparsed\nbuffer Length Received:  %d\n",buf_len);
-	__DEBUG printf("Fields of , in Buffer: %d\n",comma_cnt);
-	__DEBUG printf("Pos of * : %d\n",star_pos);
-	__DEBUG printf("Star count in data: %d\n",star_cnt);
+#ifdef DEBUG
+	printf("FUNC--nmea_canbeparsed\nbuffer Length Received:  %d\n",buf_len);
+	printf("Fields of , in Buffer: %d\n",comma_cnt);
+	printf("Pos of * : %d\n",star_pos);
+	printf("Star count in data: %d\n",star_cnt);
+#endif
 
 	return ret_sts;
 }
@@ -163,19 +168,25 @@ int nmea_checksum(char *nmea_databuf, int nmea_endmarker)
 		if(checksum_received == checksum_calculated)
 		{
 			/*Valid Checksum is received, update status to valid*/
-			__DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_received,checksum_calculated);
-			__DEBUG printf("CHECKSUM Match\n");
+#ifdef DEBUG
+			printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_received,checksum_calculated);
+			printf("CHECKSUM Match\n");
+#endif
 			checksum_status = CHECKSUM_VALID;
 		}
 		else
 		{
-			__DEBUG printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_received,checksum_calculated);
-			__DEBUG printf("CHECKSUM MISMATCH\n");
+#ifdef DEBUG
+			printf("FUNC--nmea_checksum\nreceived checksum %x    calculated checksum %x\n",checksum_received,checksum_calculated);
+			printf("CHECKSUM MISMATCH\n");
+#endif
 		}
 	}
 	else
 	{
-		__DEBUG printf("FUNC--nmea_checksum\nInvalid EndMarker received\n");
+#ifdef DEBUG
+		printf("FUNC--nmea_checksum\nInvalid EndMarker received\n");
+#endif
 	}
 
 	return checksum_status;
@@ -198,12 +209,13 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 
 	nmea_databuf = nmea_databuf + 7;
 
-	__DEBUG printf("%s\n",nmea_databuf);
-
+#ifdef DEBUG
+	printf("%s\n",nmea_databuf);
+#endif
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
 		for(itr1=0; ((nmea_databuf[itr0]  != ','  ) &&
-					(nmea_databuf[itr0] != '*'  ) )
+				(nmea_databuf[itr0] != '*'  ) )
 		; itr0++,itr1++)  // loop till next ',' as each element separated by ','
 		{
 			buf_extract[itr1] = nmea_databuf[itr0];  // extract the data between two commas
@@ -229,7 +241,9 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->utc.min = he_a2i(charbuf);
 				he_strcpy(&buf_extract[4],charbuf,2);
 				info_gpgga->utc.sec = he_a2i(charbuf);
-				__DEBUG printf("UTC    hh  %d  mm %d  ss %d\n",info_gpgga->utc.hour, info_gpgga->utc.min, info_gpgga->utc.sec);
+#ifdef DEBUG
+				printf("UTC    hh  %d  mm %d  ss %d\n",info_gpgga->utc.hour, info_gpgga->utc.min, info_gpgga->utc.sec);
+#endif
 			}
 			else
 			{
@@ -237,7 +251,9 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->utc.min  	= 0;
 				info_gpgga->utc.sec		= 0;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("UTC   INVALID\n");
+#ifdef DEBUG
+				printf("UTC   INVALID\n");
+#endif
 			}
 			break;
 		case 1:
@@ -257,7 +273,9 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				doublebuf = intbuf + (doublebuf/60);
 				info_gpgga->lat = doublebuf;
 
-				__DEBUG printf("LAT  %f\n",info_gpgga->lat);
+#ifdef DEBUG
+				printf("LAT  %f\n",info_gpgga->lat);
+#endif
 
 			}
 			else
@@ -265,8 +283,9 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				info_gpgga->lat = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("LAT  INVALID\n");
-
+#ifdef DEBUG
+				printf("LAT  INVALID\n");
+#endif
 			}
 			break;
 		case 2:
@@ -274,16 +293,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->ns = buf_extract[0] ;
 
-				__DEBUG printf("NS   %c\n",info_gpgga->ns);
-
+#ifdef DEBUG
+				printf("NS   %c\n",info_gpgga->ns);
+#endif
 			}
 			else
 			{
 				info_gpgga->ns = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("NS  INVALID\n");
-
+#ifdef DEBUG
+				printf("NS  INVALID\n");
+#endif
 			}
 			break;
 		case 3:
@@ -298,16 +319,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				doublebuf = intbuf + (doublebuf/60);
 				info_gpgga->lon = doublebuf;
 
-				__DEBUG printf("LON  %f\n",info_gpgga->lon);
-
+#ifdef DEBUG
+				printf("LON  %f\n",info_gpgga->lon);
+#endif
 			}
 			else
 			{
 				info_gpgga->lon = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("LON  INVALID\n");
-
+#ifdef DEBUG
+				printf("LON  INVALID\n");
+#endif
 			}
 			break;
 		case 4:
@@ -315,16 +338,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->ew = buf_extract[0] ;
 
-				__DEBUG printf("EW   %c\n",info_gpgga->ew);
-
+#ifdef DEBUG
+				printf("EW   %c\n",info_gpgga->ew);
+#endif
 			}
 			else
 			{
 				info_gpgga->ew = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("EW  INVALID\n");
-
+#ifdef DEBUG
+				printf("EW  INVALID\n");
+#endif
 			}
 			break;
 		case 5:
@@ -332,16 +357,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->sig = he_a2i(buf_extract);
 
-				__DEBUG printf("SIG  %d\n",info_gpgga->sig);
-
+#ifdef DEBUG
+				printf("SIG  %d\n",info_gpgga->sig);
+#endif
 			}
 			else
 			{
 				info_gpgga->sig = 0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("SIG  INVALID\n");
-
+#ifdef DEBUG
+				printf("SIG  INVALID\n");
+#endif
 			}
 			break;
 		case 6:
@@ -349,16 +376,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->satinuse = he_a2i(buf_extract);
 
-				__DEBUG printf("satinuse  %d\n",info_gpgga->satinuse);
-
+#ifdef DEBUG
+				printf("satinuse  %d\n",info_gpgga->satinuse);
+#endif
 			}
 			else
 			{
 				info_gpgga->satinuse = 0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("satinuse  INVALID\n");
-
+#ifdef DEBUG
+				printf("satinuse  INVALID\n");
+#endif
 			}
 			break;
 		case 7:
@@ -366,16 +395,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->HDOP = he_a2f(buf_extract);
 
-				__DEBUG printf("HDOP   %f\n",info_gpgga->HDOP);
-
+#ifdef DEBUG
+				printf("HDOP   %f\n",info_gpgga->HDOP);
+#endif
 			}
 			else
 			{
 				info_gpgga->HDOP = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("HDOP  INVALID\n");
-
+#ifdef DEBUG
+				printf("HDOP  INVALID\n");
+#endif
 			}
 			break;
 		case 8:
@@ -383,16 +414,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->elv = he_a2f(buf_extract);
 
-				__DEBUG printf("elv   %f\n",info_gpgga->elv);
-
+#ifdef DEBUG
+				printf("elv   %f\n",info_gpgga->elv);
+#endif
 			}
 			else
 			{
 				info_gpgga->elv = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("elv  INVALID\n");
-
+#ifdef DEBUG
+				printf("elv  INVALID\n");
+#endif
 			}
 			break;
 		case 9:
@@ -400,16 +433,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->elv_units = buf_extract[0] ;
 
-			__DEBUG printf("elv_units   %c\n",info_gpgga->elv_units);
-
+#ifdef DEBUG
+				printf("elv_units   %c\n",info_gpgga->elv_units);
+#endif
 			}
 			else
 			{
 				info_gpgga->elv_units = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("elv_units  INVALID\n");
-
+#ifdef DEBUG
+				printf("elv_units  INVALID\n");
+#endif
 			}
 			break;
 		case 10:
@@ -417,16 +452,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->diff = he_a2f(buf_extract);
 
-				__DEBUG printf("diff   %f\n",info_gpgga->diff);
-
+#ifdef DEBUG
+				printf("diff   %f\n",info_gpgga->diff);
+#endif
 			}
 			else
 			{
 				info_gpgga->diff = 0.0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("diff  INVALID\n");
-
+#ifdef DEBUG
+				printf("diff  INVALID\n");
+#endif
 			}
 			break;
 		case 11:
@@ -434,16 +471,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			{
 				info_gpgga->diff_units = buf_extract[0] ;
 
-				__DEBUG printf("diff_units   %c\n",info_gpgga->diff_units);
-
+#ifdef DEBUG
+				printf("diff_units   %c\n",info_gpgga->diff_units);
+#endif
 			}
 			else
 			{
 				info_gpgga->diff_units = '0';
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("diff_units  INVALID\n");
-
+#ifdef DEBUG
+				printf("diff_units  INVALID\n");
+#endif
 			}
 			break;
 		case 12:
@@ -463,13 +502,15 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		default:
 			nmea_vldty = NMEA_INVALID;
 
-			__DEBUG printf("default");
-
+#ifdef DEBUG
+			printf("default");
+#endif
 			break;
 		}
 
-		__DEBUG printf(" \n");
-
+#ifdef DEBUG
+		printf(" \n");
+#endif
 	}
 	return nmea_vldty;
 }
@@ -487,12 +528,13 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 
 	nmea_databuf = nmea_databuf + 7;
 
-	__DEBUG printf("%s\n",nmea_databuf);
-
+#ifdef DEBUG
+	printf("%s\n",nmea_databuf);
+#endif
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
 		for(itr1=0; ( (nmea_databuf[itr0]  != ','  ) &&
-					  (nmea_databuf[itr0]  != '*'  ) ) ; itr0++,itr1++)  // loop till next ',' as each element separated by ','
+				(nmea_databuf[itr0]  != '*'  ) ) ; itr0++,itr1++)  // loop till next ',' as each element separated by ','
 		{
 			buf_extract[itr1] = nmea_databuf[itr0];  // extract the data between two commas
 		}
@@ -512,16 +554,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->fix_mode = buf_extract[0] ;
 
-				__DEBUG printf("fix_mode   %c\n",info_gpgsa->fix_mode);
-
+#ifdef DEBUG
+				printf("fix_mode   %c\n",info_gpgsa->fix_mode);
+#endif
 			}
 			else
 			{
 				info_gpgsa->fix_mode = '0' ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("fix_mode   INVALID\n");
-
+#ifdef DEBUG
+				printf("fix_mode   INVALID\n");
+#endif
 			}
 			break;
 		case 1:
@@ -529,16 +573,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->fix_type = he_a2i(buf_extract);
 
-				__DEBUG printf("fix_type  %d\n",info_gpgsa->fix_type);
-
+#ifdef DEBUG
+				printf("fix_type  %d\n",info_gpgsa->fix_type);
+#endif
 			}
 			else
 			{
 				info_gpgsa->fix_type = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("fix_type  INVALID\n");
-
+#ifdef DEBUG
+				printf("fix_type  INVALID\n");
+#endif
 			}
 			break;
 		case 2:
@@ -546,16 +592,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[0] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[0]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[0]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[0] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 3:
@@ -563,16 +611,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[1] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[1]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[1]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[1] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 4:
@@ -580,16 +630,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[2] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[2]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[2]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[2] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 5:
@@ -597,16 +649,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[3] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[3]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[3]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[3] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 6:
@@ -614,16 +668,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[4] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[4]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[4]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[4] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 7:
@@ -631,16 +687,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[5] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[5]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[5]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[5] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 8:
@@ -648,16 +706,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[6] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[6]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[6]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[6] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 9:
@@ -665,16 +725,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[7] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[7]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[7]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[7] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 10:
@@ -682,16 +744,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[8] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[8]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[8]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[8] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 11:
@@ -699,16 +763,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[9] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[9]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[9]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[9] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 12:
@@ -716,16 +782,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[10] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[10]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[10]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[10] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 13:
@@ -733,16 +801,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->sat_prn[11] = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_prn  %d\n",info_gpgsa->sat_prn[11]);
-
+#ifdef DEBUG
+				printf("sat_prn  %d\n",info_gpgsa->sat_prn[11]);
+#endif
 			}
 			else
 			{
 				info_gpgsa->sat_prn[11] = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_prn  INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_prn  INVALID\n");
+#endif
 			}
 			break;
 		case 14:
@@ -750,16 +820,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->PDOP = he_a2f(buf_extract);
 
-				__DEBUG printf("PDOP   %f\n",info_gpgsa->PDOP);
-
+#ifdef DEBUG
+				printf("PDOP   %f\n",info_gpgsa->PDOP);
+#endif
 			}
 			else
 			{
 				info_gpgsa->PDOP = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("PDOP  INVALID\n");
-
+#ifdef DEBUG
+				printf("PDOP  INVALID\n");
+#endif
 			}
 			break;
 		case 15:
@@ -767,16 +839,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->HDOP = he_a2f(buf_extract);
 
-				__DEBUG printf("HDOP   %f\n",info_gpgsa->HDOP);
-
+#ifdef DEBUG
+				printf("HDOP   %f\n",info_gpgsa->HDOP);
+#endif
 			}
 			else
 			{
 				info_gpgsa->HDOP = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("HDOP  INVALID\n");
-
+#ifdef DEBUG
+				printf("HDOP  INVALID\n");
+#endif
 			}
 			break;
 		case 16:
@@ -784,28 +858,33 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 			{
 				info_gpgsa->VDOP = he_a2f(buf_extract);
 
-				__DEBUG printf("VDOP   %f\n",info_gpgsa->VDOP);
-
+#ifdef DEBUG
+				printf("VDOP   %f\n",info_gpgsa->VDOP);
+#endif
 			}
 			else
 			{
 				info_gpgsa->VDOP = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("VDOP  INVALID\n");
-
+#ifdef DEBUG
+				printf("VDOP  INVALID\n");
+#endif
 			}
 			break;
 		default:
 			nmea_vldty = NMEA_INVALID;
 
-			__DEBUG printf("default");
-			__DEBUG printf("%c\n",nmea_databuf[itr0+1]);
-			__DEBUG printf("-----%s\n",buf_extract);
-
+#ifdef DEBUG
+			printf("default");
+			printf("%c\n",nmea_databuf[itr0+1]);
+			printf("-----%s\n",buf_extract);
+#endif
 			break;
 		}
+#ifdef DEBUG
 		fflush(stdout);
+#endif
 	}
 
 	return nmea_vldty;
@@ -829,7 +908,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
 		for(itr1=0; ((nmea_databuf[itr0]  != ','  ) &&
-					(nmea_databuf[itr0] != '*'  ) )
+				(nmea_databuf[itr0] != '*'  ) )
 		; itr0++,itr1++)  // loop till next ',' as each element separated by ','
 		{
 			buf_extract[itr1] = nmea_databuf[itr0];  // extract the data between two commas
@@ -857,16 +936,18 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->pack_count = he_a2i(buf_extract);
 
-				__DEBUG printf("pack_count  %d\n",info_gpgsv->pack_count);
-
+#ifdef DEBUG
+				printf("pack_count  %d\n",info_gpgsv->pack_count);
+#endif
 			}
 			else
 			{
 				info_gpgsv->pack_count = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("pack_count INVALID\n");
-
+#ifdef DEBUG
+				printf("pack_count INVALID\n");
+#endif
 			}
 			break;
 		case 2:
@@ -874,16 +955,18 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->pack_index = he_a2i(buf_extract);
 
-				__DEBUG printf("pack_index  %d\n",info_gpgsv->pack_index);
-
+#ifdef DEBUG
+				printf("pack_index  %d\n",info_gpgsv->pack_index);
+#endif
 			}
 			else
 			{
 				info_gpgsv->pack_index = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("pack_index INVALID\n");
-
+#ifdef DEBUG
+				printf("pack_index INVALID\n");
+#endif
 			}
 			break;
 		case 3:
@@ -891,16 +974,18 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_count = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_count  %d\n",info_gpgsv->sat_count);
-
+#ifdef DEBUG
+				printf("sat_count  %d\n",info_gpgsv->sat_count);
+#endif
 			}
 			else
 			{
 				info_gpgsv->sat_count = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_count INVALID\n");
-
+#ifdef DEBUG
+				printf("sat_count INVALID\n");
+#endif
 			}
 			break;
 		case 4:
@@ -908,16 +993,18 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].id = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_data[%d].id  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].id);
-
+#ifdef DEBUG
+				printf("sat_data[%d].id  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].id);
+#endif
 			}
 			else
 			{
 				info_gpgsv->sat_data[sat_data_idx].id = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_data[%d].id  INVALID\n",sat_data_idx);
-
+#ifdef DEBUG
+				printf("sat_data[%d].id  INVALID\n",sat_data_idx);
+#endif
 			}
 			break;
 		case 5:
@@ -925,16 +1012,18 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].elv = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_data[%d].elv  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].elv);
-
+#ifdef DEBUG
+				printf("sat_data[%d].elv  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].elv);
+#endif
 			}
 			else
 			{
 				info_gpgsv->sat_data[sat_data_idx].elv = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_data[%d].elv  INVALID\n",sat_data_idx);
-
+#ifdef DEBUG
+				printf("sat_data[%d].elv  INVALID\n",sat_data_idx);
+#endif
 			}
 			break;
 		case 6:
@@ -942,16 +1031,18 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].azimuth = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_data[%d].azimuth  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].azimuth);
-
+#ifdef DEBUG
+				printf("sat_data[%d].azimuth  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].azimuth);
+#endif
 			}
 			else
 			{
 				info_gpgsv->sat_data[sat_data_idx].azimuth = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_data[%d].azimuth  INVALID\n",sat_data_idx);
-
+#ifdef DEBUG
+				printf("sat_data[%d].azimuth  INVALID\n",sat_data_idx);
+#endif
 			}
 			break;
 		case 7:
@@ -959,30 +1050,34 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 			{
 				info_gpgsv->sat_data[sat_data_idx].sig = he_a2i(buf_extract);
 
-				__DEBUG printf("sat_data[%d].sig  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].sig);
-
+#ifdef DEBUG
+				printf("sat_data[%d].sig  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].sig);
+#endif
 			}
 			else
 			{
 				info_gpgsv->sat_data[sat_data_idx].sig = 0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("sat_data[%d].sig  INVALID\n",sat_data_idx);
-
+#ifdef DEBUG
+				printf("sat_data[%d].sig  INVALID\n",sat_data_idx);
+#endif
 			}
 			break;
 		default:
 			nmea_vldty = NMEA_INVALID;
 
-			__DEBUG printf("GPGSV:  ERROR  %s\n",buf_extract);
-
+#ifdef DEBUG
+			printf("GPGSV:  ERROR  %s\n",buf_extract);
+#endif
 			break;
 		}
 	}
 
-	__DEBUG printf("GPGSV ERROR:  IMPLEMENTATION PENDING \nGPGSV has multiple packets this function handles only one packet\n");
+#ifdef DEBUG
+	printf("GPGSV ERROR:  IMPLEMENTATION PENDING \nGPGSV has multiple packets this function handles only one packet\n");
 	fflush(stdout);
-
+#endif
 	return nmea_vldty;
 }
 
@@ -1006,7 +1101,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
 		for(itr1=0; ((nmea_databuf[itr0]  != ','  ) &&
-					(nmea_databuf[itr0] != '*'  ) )
+				(nmea_databuf[itr0] != '*'  ) )
 		; itr0++,itr1++)  // loop till next ',' as each element separated by ','
 		{
 			buf_extract[itr1] = nmea_databuf[itr0];  // extract the data between two commas
@@ -1022,255 +1117,280 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		}
 		switch(++swt_case_idx)			//Each case for each element in the buffer
 		{
-			case 1:
-				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
-				{
-					he_strcpy(buf_extract,charbuf,2);
-					info_gprmc->utc.hour = he_a2i(charbuf);
-					he_strcpy(&buf_extract[2],charbuf,2);
-					info_gprmc->utc.min = he_a2i(charbuf);
-					he_strcpy(&buf_extract[4],charbuf,2);
-					info_gprmc->utc.sec = he_a2i(charbuf);
+		case 1:
+			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
+			{
+				he_strcpy(buf_extract,charbuf,2);
+				info_gprmc->utc.hour = he_a2i(charbuf);
+				he_strcpy(&buf_extract[2],charbuf,2);
+				info_gprmc->utc.min = he_a2i(charbuf);
+				he_strcpy(&buf_extract[4],charbuf,2);
+				info_gprmc->utc.sec = he_a2i(charbuf);
 
-					__DEBUG printf("\nUTC    hh  %d  mm %d  ss %d\n",info_gprmc->utc.hour, info_gprmc->utc.min, info_gprmc->utc.sec);
-
-				}
-				else
-				{
-					info_gprmc->utc.hour = 0;
-					info_gprmc->utc.min  = 0;
-					info_gprmc->utc.sec  = 0;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("UTC    INVALID\n");
-
-				}
-				break;
-			case 2:
-				if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
-				{
-					info_gprmc->status = buf_extract[0] ;
-
-					__DEBUG printf("status   %c\n",info_gprmc->status);
-
-				}
-				else
-				{
-					info_gprmc->status = '0' ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("status   INVALID\n");
-
-				}
-				break;
-			case 3:
-				/*   Calculation is as below
-				 *  Lat : 3137.36664 becomes 31 degrees and 37.26664 seconds = 31 + 37.36664/60 = 31.6227773
-				 *	Lon : 00212.21149 becomes 2 degrees and 12.21149 seconds = 2 + 12.21149/60 = 2.20352483
-				 *	So as latitude is in format DDSS.SSSSS
-				 *	DD = int(float(Lat)/100) = int(3137.36664/100) = int(31.3736664) = 31
-				 *	SS = float(lat) - DD * 100 = 3137.36664 - 31 * 100 = 3137.36664 - 3100 = 37.36664
-				 *	LatDec = DD + SS/60 = 31 + 37.36664/60 = 31 + 0.6227773333333333 = 31.6227773333333333
-				 */
-				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
-				{
-					doublebuf = he_a2f(buf_extract);
-					intbuf = (int) ( ((float)(doublebuf)/100) );
-					doublebuf = (float)(doublebuf - intbuf *100);
-					doublebuf = intbuf + (doublebuf/60);
-					info_gprmc->lat = doublebuf;
-
-					__DEBUG printf("LAT  %f\n",info_gprmc->lat);
-
-				}
-				else
-				{
-					info_gprmc->lat = 0.0 ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("LAT   INVALID\n");
-
-				}
-				break;
-			case 4:
-				if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
-				{
-					info_gprmc->ns = buf_extract[0] ;
-
-					__DEBUG printf("NS   %c\n",info_gprmc->ns);
-
-				}
-				else
-				{
-					info_gprmc->ns = '0' ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("NS   INVALID\n");
-
-				}
-				break;
-			case 5:
-				/*
-				 *  Calculation is similar to Latitude
-				 */
-				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
-				{
-					doublebuf = he_a2f(buf_extract);
-					intbuf = (int) ( ((float)(doublebuf)/100) );
-					doublebuf = (float)(doublebuf - intbuf *100);
-					doublebuf = intbuf + (doublebuf/60);
-					info_gprmc->lon = doublebuf;
-
-					__DEBUG printf("LON  %f\n",info_gprmc->lon);
-
-				}
-				else
-				{
-					info_gprmc->lon = 0.0 ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("LON  INVALID\n");
-
-				}
-				break;
-			case 6:
-				if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
-				{
-					info_gprmc->ew = buf_extract[0] ;
-
-					__DEBUG printf("EW   %c\n",info_gprmc->ew);
-
-				}
-				else
-				{
-					info_gprmc->ew = '0' ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("EW   INVALID\n");
-
-				}
-				break;
-			case 7:
-				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
-				{
-					info_gprmc->speed = he_a2f(buf_extract);
-
-					__DEBUG printf("speed   %f\n",info_gprmc->speed);
-
-				}
-				else
-				{
-					info_gprmc->speed = 0.0 ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("speed   INVALID\n");
-
-				}
-				break;
-			case 8:
-				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
-				{
-					info_gprmc->direction = he_a2f(buf_extract);
-
-					__DEBUG printf("direction   %f\n",info_gprmc->direction);
-
-				}
-				else
-				{
-					info_gprmc->direction = he_a2f(buf_extract);
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("direction   INVALID\n");
-
-				}
-				break;
-			case 9:
-				if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
-				{
-					he_strcpy(buf_extract,charbuf,2);
-					info_gprmc->date.day = he_a2i(charbuf);
-					he_strcpy(&buf_extract[2],charbuf,2);
-					info_gprmc->date.mon = he_a2i(charbuf);
-					he_strcpy(&buf_extract[4],charbuf,2);
-					info_gprmc->date.year = he_a2i(charbuf);
-					info_gprmc->date.year = info_gprmc->date.year + 2000; // Year to be represented in YYYY hence adding 2000
-
-					__DEBUG printf("DATE    dd  %d  mm %d  yy %d\n",info_gprmc->date.day, info_gprmc->date.mon, info_gprmc->date.year);
-
-				}
-				else
-				{
-					info_gprmc->date.day  = 0;
-					info_gprmc->date.mon  = 0;
-					info_gprmc->date.year = 0;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("DATE   INVALID\n");
-
-				}
-				break;
-			case 10:
-				if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
-				{
-					info_gprmc->declination = he_a2f(buf_extract);
-
-					__DEBUG printf("declination   %f\n",info_gprmc->declination);
-
-				}
-				else
-				{
-					info_gprmc->declination = 0.0 ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("declination   INVAID\n");
-
-				}
-				break;
-			case 11:
-				if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
-				{
-					info_gprmc->declin_ew = buf_extract[0] ;
-
-					__DEBUG printf("declin_ew   %c\n",info_gprmc->declin_ew);
-
-				}
-				else
-				{
-					info_gprmc->declin_ew = '0' ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("declin_ew   INVALID\n");
-
-				}
-				break;
-			case 12:
-				if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
-				{
-					info_gprmc->mode = buf_extract[0] ;
-
-					__DEBUG printf("mode   %c\n",info_gprmc->mode);
-
-				}
-				else
-				{
-					info_gprmc->mode = '0' ;
-					nmea_vldty = NMEA_INVALID;
-
-					__DEBUG printf("mode   INVALID\n");
-
-				}
-				break;
-			default:
+#ifdef DEBUG
+				printf("\nUTC    hh  %d  mm %d  ss %d\n",info_gprmc->utc.hour, info_gprmc->utc.min, info_gprmc->utc.sec);
+#endif
+			}
+			else
+			{
+				info_gprmc->utc.hour = 0;
+				info_gprmc->utc.min  = 0;
+				info_gprmc->utc.sec  = 0;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("\ngprmc:  error\n");
-				__DEBUG printf("buffer @ error is : %s\n",buf_extract);
+#ifdef DEBUG
+				printf("UTC    INVALID\n");
+#endif
+			}
+			break;
+		case 2:
+			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
+			{
+				info_gprmc->status = buf_extract[0] ;
 
-				break;
+#ifdef DEBUG
+				printf("status   %c\n",info_gprmc->status);
+#endif
+			}
+			else
+			{
+				info_gprmc->status = '0' ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("status   INVALID\n");
+#endif
+			}
+			break;
+		case 3:
+			/*   Calculation is as below
+			 *  Lat : 3137.36664 becomes 31 degrees and 37.26664 seconds = 31 + 37.36664/60 = 31.6227773
+			 *	Lon : 00212.21149 becomes 2 degrees and 12.21149 seconds = 2 + 12.21149/60 = 2.20352483
+			 *	So as latitude is in format DDSS.SSSSS
+			 *	DD = int(float(Lat)/100) = int(3137.36664/100) = int(31.3736664) = 31
+			 *	SS = float(lat) - DD * 100 = 3137.36664 - 31 * 100 = 3137.36664 - 3100 = 37.36664
+			 *	LatDec = DD + SS/60 = 31 + 37.36664/60 = 31 + 0.6227773333333333 = 31.6227773333333333
+			 */
+			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
+			{
+				doublebuf = he_a2f(buf_extract);
+				intbuf = (int) ( ((float)(doublebuf)/100) );
+				doublebuf = (float)(doublebuf - intbuf *100);
+				doublebuf = intbuf + (doublebuf/60);
+				info_gprmc->lat = doublebuf;
+
+#ifdef DEBUG
+				printf("LAT  %f\n",info_gprmc->lat);
+#endif
+			}
+			else
+			{
+				info_gprmc->lat = 0.0 ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("LAT   INVALID\n");
+#endif
+			}
+			break;
+		case 4:
+			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
+			{
+				info_gprmc->ns = buf_extract[0] ;
+
+#ifdef DEBUG
+				printf("NS   %c\n",info_gprmc->ns);
+#endif
+			}
+			else
+			{
+				info_gprmc->ns = '0' ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("NS   INVALID\n");
+#endif
+			}
+			break;
+		case 5:
+			/*
+			 *  Calculation is similar to Latitude
+			 */
+			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
+			{
+				doublebuf = he_a2f(buf_extract);
+				intbuf = (int) ( ((float)(doublebuf)/100) );
+				doublebuf = (float)(doublebuf - intbuf *100);
+				doublebuf = intbuf + (doublebuf/60);
+				info_gprmc->lon = doublebuf;
+
+#ifdef DEBUG
+				printf("LON  %f\n",info_gprmc->lon);
+#endif
+			}
+			else
+			{
+				info_gprmc->lon = 0.0 ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("LON  INVALID\n");
+#endif
+			}
+			break;
+		case 6:
+			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
+			{
+				info_gprmc->ew = buf_extract[0] ;
+
+#ifdef DEBUG
+				printf("EW   %c\n",info_gprmc->ew);
+#endif
+			}
+			else
+			{
+				info_gprmc->ew = '0' ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("EW   INVALID\n");
+#endif
+			}
+			break;
+		case 7:
+			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
+			{
+				info_gprmc->speed = he_a2f(buf_extract);
+
+#ifdef DEBUG
+				printf("speed   %f\n",info_gprmc->speed);
+#endif
+			}
+			else
+			{
+				info_gprmc->speed = 0.0 ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("speed   INVALID\n");
+#endif
+			}
+			break;
+		case 8:
+			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
+			{
+				info_gprmc->direction = he_a2f(buf_extract);
+
+#ifdef DEBUG
+				printf("direction   %f\n",info_gprmc->direction);
+#endif
+			}
+			else
+			{
+				info_gprmc->direction = he_a2f(buf_extract);
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("direction   INVALID\n");
+#endif
+			}
+			break;
+		case 9:
+			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
+			{
+				he_strcpy(buf_extract,charbuf,2);
+				info_gprmc->date.day = he_a2i(charbuf);
+				he_strcpy(&buf_extract[2],charbuf,2);
+				info_gprmc->date.mon = he_a2i(charbuf);
+				he_strcpy(&buf_extract[4],charbuf,2);
+				info_gprmc->date.year = he_a2i(charbuf);
+				info_gprmc->date.year = info_gprmc->date.year + 2000; // Year to be represented in YYYY hence adding 2000
+
+#ifdef DEBUG
+				printf("DATE    dd  %d  mm %d  yy %d\n",info_gprmc->date.day, info_gprmc->date.mon, info_gprmc->date.year);
+#endif
+			}
+			else
+			{
+				info_gprmc->date.day  = 0;
+				info_gprmc->date.mon  = 0;
+				info_gprmc->date.year = 0;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("DATE   INVALID\n");
+#endif
+			}
+			break;
+		case 10:
+			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
+			{
+				info_gprmc->declination = he_a2f(buf_extract);
+
+#ifdef DEBUG
+				printf("declination   %f\n",info_gprmc->declination);
+#endif
+			}
+			else
+			{
+				info_gprmc->declination = 0.0 ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("declination   INVAID\n");
+#endif
+			}
+			break;
+		case 11:
+			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
+			{
+				info_gprmc->declin_ew = buf_extract[0] ;
+
+#ifdef DEBUG
+				printf("declin_ew   %c\n",info_gprmc->declin_ew);
+#endif
+			}
+			else
+			{
+				info_gprmc->declin_ew = '0' ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("declin_ew   INVALID\n");
+#endif
+			}
+			break;
+		case 12:
+			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
+			{
+				info_gprmc->mode = buf_extract[0] ;
+
+#ifdef DEBUG
+				printf("mode   %c\n",info_gprmc->mode);
+#endif
+			}
+			else
+			{
+				info_gprmc->mode = '0' ;
+				nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+				printf("mode   INVALID\n");
+#endif
+			}
+			break;
+		default:
+			nmea_vldty = NMEA_INVALID;
+
+#ifdef DEBUG
+			printf("\ngprmc:  error\n");
+			printf("buffer @ error is : %s\n",buf_extract);
+#endif
+			break;
 		}
-
+#ifdef DEBUG
 		fflush(stdout);
-
+#endif
 
 	}
 
@@ -1295,7 +1415,7 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 	while(nmea_databuf[itr0] != '*') // Loop till end of the buffer
 	{
 		for(itr1=0; ((nmea_databuf[itr0]  != ','  ) &&
-					(nmea_databuf[itr0] != '*'  ) )
+				(nmea_databuf[itr0] != '*'  ) )
 		; itr0++,itr1++)  // loop till next ',' as each element separated by ','
 		{
 			buf_extract[itr1] = nmea_databuf[itr0];  // extract the data between two commas
@@ -1317,16 +1437,18 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 			{
 				info_gpvtg->dir = he_a2f(buf_extract);
 
-				__DEBUG printf("dir   %f\n",info_gpvtg->dir);
-
+#ifdef DEBUG
+				printf("dir   %f\n",info_gpvtg->dir);
+#endif
 			}
 			else
 			{
 				info_gpvtg->dir = 0.0 ;
 				nmea_vldty = NMEA_INVALID;
 
-				__DEBUG printf("dir  INVALID\n");
-
+#ifdef DEBUG
+				printf("dir  INVALID\n");
+#endif
 			}
 			break;
 		case 2:
@@ -1334,97 +1456,126 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 			{
 				info_gpvtg->dir_t = buf_extract[0] ;
 
-				__DEBUG printf("dir_t   %c\n",info_gpvtg->dir_t);
-
+#ifdef DEBUG
+				printf("dir_t   %c\n",info_gpvtg->dir_t);
+#endif
 			}
 			else
 			{
 				info_gpvtg->dir_t = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("dir_t  INVALID\n");
+#ifdef DEBUG
+				printf("dir_t  INVALID\n");
+#endif
 			}
 			break;
 		case 3:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				info_gpvtg->dec = he_a2f(buf_extract);
-				__DEBUG printf("dec   %f\n",info_gpvtg->dec);
+#ifdef DEBUG
+				printf("dec   %f\n",info_gpvtg->dec);
+#endif
 			}
 			else
 			{
 				info_gpvtg->dec = 0.0;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("dec  INVALID\n");
+#ifdef DEBUG
+				printf("dec  INVALID\n");
+#endif
 			}
 			break;
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
 				info_gpvtg->dec_m = buf_extract[0] ;
-				__DEBUG printf("dec_m   %c\n",info_gpvtg->dec_m);
+#ifdef DEBUG
+				printf("dec_m   %c\n",info_gpvtg->dec_m);
+#endif
 			}
 			else
 			{
 				info_gpvtg->dec_m = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("dec_m  INVALID\n");
+#ifdef DEBUG
+				printf("dec_m  INVALID\n");
+#endif
 			}
 			break;
 		case 5:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				info_gpvtg->spn = he_a2f(buf_extract);
-				__DEBUG printf("spn   %f\n",info_gpvtg->spn);
+#ifdef DEBUG
+				printf("spn   %f\n",info_gpvtg->spn);
+#endif
 			}
 			else
 			{
 				info_gpvtg->spn = 0.0;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("spn  INVALID\n");
+#ifdef DEBUG
+				printf("spn  INVALID\n");
+#endif
 			}
 			break;
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
 				info_gpvtg->spn_n = buf_extract[0] ;
-				__DEBUG printf("spn_n   %c\n",info_gpvtg->spn_n);
+#ifdef DEBUG
+				printf("spn_n   %c\n",info_gpvtg->spn_n);
+#endif
 			}
 			else
 			{
 				info_gpvtg->spn_n = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("spn_n  INVALID\n");
+#ifdef DEBUG
+				printf("spn_n  INVALID\n");
+#endif
 			}
 			break;
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				info_gpvtg->spk = he_a2f(buf_extract);
-				__DEBUG printf("spk   %f\n",info_gpvtg->spk);
+#ifdef DEBUG
+				printf("spk   %f\n",info_gpvtg->spk);
+#endif
 			}
 			else
 			{
 				info_gpvtg->spk = 0.0;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("spk  INVALID\n");
+#ifdef DEBUG
+				printf("spk  INVALID\n");
+#endif
 			}
 			break;
 		case 8:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
 				info_gpvtg->spk_k = buf_extract[0] ;
-				__DEBUG printf("spk_k   %c\n",info_gpvtg->spk_k);
+#ifdef DEBUG
+				printf("spk_k   %c\n",info_gpvtg->spk_k);
+#endif
 			}
 			else
 			{
 				info_gpvtg->spk_k = '0' ;
 				nmea_vldty = NMEA_INVALID;
-				__DEBUG printf("spk_k  INVALID\n");
+#ifdef DEBUG
+				printf("spk_k  INVALID\n");
+#endif
 			}
 			break;
 		default:
 			nmea_vldty = NMEA_INVALID;
-			__DEBUG printf("\ngpvtg:  NMEA_INVALID\n");
+#ifdef DEBUG
+			printf("\ngpvtg:  NMEA_INVALID\n");
+#endif
 			break;
 		}
 	}
@@ -1461,16 +1612,22 @@ int nmea_FindEndMarker_validity(char *nmea_inputbuf)
 
 		if (nmea_endmarker)
 		{
-			__DEBUG printf("NMEA is Valid and can be parsed\n EndMarker set at : %d\n",nmea_endmarker);
+#ifdef DEBUG
+			printf("NMEA is Valid and can be parsed\n EndMarker set at : %d\n",nmea_endmarker);
+#endif
 		}
 		else
 		{
-			__DEBUG printf("NMEA is InValid and cannot be parsed\n");
+#ifdef DEBUG
+			printf("NMEA is InValid and cannot be parsed\n");
+#endif
 		}
 	}
 	else
 	{
-		__DEBUG printf("NMEA is InValid and cannot be parsed\n");
+#ifdef DEBUG
+		printf("NMEA is InValid and cannot be parsed\n");
+#endif
 		/* Invalid Data buffer, Do Nothing*/
 	}
 
@@ -1482,48 +1639,67 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 	int ptype;
 	int nmea_endmarker = NMEA_INVALID;
 	int nmeabuf_sts    = NMEA_INVALID;
-	__DEBUG printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
-
+#ifdef DEBUG
+	printf("WARNING\nLimits of Sting Length is not still measured, TO BE DONE ON HARDWARE CHECKS\n");
+#endif
 	/*Check if the buffer is valid, get the valid end marker*/
 	nmea_endmarker = nmea_FindEndMarker_validity(nmea_inputbuf);
 
 	if(NMEA_INVALID != nmea_checksum(nmea_inputbuf, nmea_endmarker))
 	{
 		ptype = nmea_typecheck(nmea_inputbuf);
-		__DEBUG printf("ptype   %d\n",ptype);
+#ifdef DEBUG
+		printf("ptype   %d\n",ptype);
+#endif
 		switch (ptype)
 		{
 		case GPGGA:
-			__DEBUG printf("GPGGA");
+#ifdef DEBUG
+			printf("GPGGA");
+#endif
 			nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
 			break;
 		case GPGSA:
-			__DEBUG printf("GPGSA");
+#ifdef DEBUG
+			printf("GPGSA");
+#endif
 			nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
 			break;
 		case GPGSV:
-			__DEBUG printf("GPGSV");
+#ifdef DEBUG
+			printf("GPGSV");
+#endif
 			nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
 			break;
 		case GPRMC:
-			__DEBUG printf("GPRMC");
+#ifdef DEBUG
+			printf("GPRMC");
+#endif
 			nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
 			break;
 		case GPVTG:
-			__DEBUG printf("GPVTG");
+#ifdef DEBUG
+			printf("GPVTG");
+#endif
 			nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
 			break;
 		default:
 			nmeabuf_sts = NMEA_INVALID;
-			__DEBUG printf("error");
+#ifdef DEBUG
+			printf("error");
+#endif
 			break;
 		}
+#ifdef DEBUG
 		fflush(stdout);
+#endif
 	}
 	else
 	{
 		nmeabuf_sts = NMEA_INVALID;
-		__DEBUG printf("WRONG INPUT:  %s\n",nmea_inputbuf);
+#ifdef DEBUG
+		printf("WRONG INPUT:  %s\n",nmea_inputbuf);
+#endif
 	}
 
 	return nmeabuf_sts;
@@ -1534,7 +1710,7 @@ int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 	int nmeabuf_sts = NMEA_INVALID;
 
 	he_i2a(nmea_data->info_gpgga.sig,nmea_data_str->gps_vldty);
-//DATE
+	//DATE
 	if(nmea_data->info_gprmc.date.day <= 9)
 	{
 		he_i2a(nmea_data->info_gprmc.date.day,&nmea_data_str->date[1]);
@@ -1555,7 +1731,7 @@ int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 		he_i2a(nmea_data->info_gprmc.date.mon,&nmea_data_str->date[2]);
 	}
 	he_i2a(nmea_data->info_gprmc.date.year,&nmea_data_str->date[4]);
-// TIME
+	// TIME
 	if(nmea_data->info_gprmc.utc.hour <= 9)
 	{
 		he_i2a(nmea_data->info_gprmc.utc.hour,&nmea_data_str->time[1]);
@@ -1584,15 +1760,15 @@ int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 		he_i2a(nmea_data->info_gprmc.utc.sec,&nmea_data_str->time[4]);
 	}
 
-//LAT and LONG
+	//LAT and LONG
 	he_f2a(nmea_data->info_gpgga.lat,nmea_data_str->lat,6);
 	nmea_data_str->lat_dir = nmea_data->info_gpgga.ns ;
 	he_f2a(nmea_data->info_gpgga.lon,nmea_data_str->lon,6);
 	nmea_data_str->lon_dir = nmea_data->info_gpgga.ew ;
-//SPEED
+	//SPEED
 	he_f2a(nmea_data->info_gpvtg.spk,nmea_data_str->speed,3);
 
-//SAT_COUNT
+	//SAT_COUNT
 	if(nmea_data->info_gpgsv.sat_count <= 9U)
 	{
 		he_i2a(nmea_data->info_gpgsv.sat_count,&nmea_data_str->num_sat_fix[1]);
@@ -1603,17 +1779,19 @@ int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 		he_i2a(nmea_data->info_gpgsv.sat_count,nmea_data_str->num_sat_fix);
 	}
 
-//ALTITUDE
+	//ALTITUDE
 	he_f2a(nmea_data->info_gpgga.elv,nmea_data_str->altitude,3);
 
-	__DEBUG printf("%s  GPS VALIDITY\n",nmea_data_str->gps_vldty);
-	__DEBUG printf("%s Date\n",nmea_data_str->date);
-	__DEBUG printf("%s Time\n",nmea_data_str->time);
-	__DEBUG printf("%lf  lat in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lat,nmea_data_str->lat,nmea_data_str->lat_dir);
-	__DEBUG printf("%lf  lon in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lon,nmea_data_str->lon,nmea_data_str->lon_dir);
-	__DEBUG printf("%lf  speed in string => %s \n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpvtg.spk,nmea_data_str->speed);
-	__DEBUG printf("%s SAT_COUNT\n",nmea_data_str->num_sat_fix);
-	__DEBUG printf("%s ALTITUDE\n",nmea_data_str->altitude);
+#ifdef DEBUG
+	printf("%s  GPS VALIDITY\n",nmea_data_str->gps_vldty);
+	printf("%s Date\n",nmea_data_str->date);
+	printf("%s Time\n",nmea_data_str->time);
+	printf("%lf  lat in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lat,nmea_data_str->lat,nmea_data_str->lat_dir);
+	printf("%lf  lon in string => %s %c\n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpgga.lon,nmea_data_str->lon,nmea_data_str->lon_dir);
+	printf("%lf  speed in string => %s \n BUG IN FLOAT FUNCTION\n",nmea_data->info_gpvtg.spk,nmea_data_str->speed);
+	printf("%s SAT_COUNT\n",nmea_data_str->num_sat_fix);
+	printf("%s ALTITUDE\n",nmea_data_str->altitude);
+#endif
 	return nmeabuf_sts;
 
 }
