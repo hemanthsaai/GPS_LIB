@@ -13,6 +13,10 @@
 #include <stdio.h>
 #endif
 
+/*GLOBAL NMEA BUFFERS*/
+nmea_info_grp_type 	nmea_data;
+NMEA_DATA_STR		nmea_data_str;
+
 /*
  * Check if the nmea has * and ,
  * because after this all the functions consider the line ending as *
@@ -196,7 +200,7 @@ int nmea_checksum(char *nmea_databuf, int nmea_endmarker)
 /**
  * \brief Extracts nmea_databuf data and fills info_gpgga structure
  */
-int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
+int extract_nmeaGPGGA(char *nmea_databuf)
 {
 	char buf_extract[15] = {0};
 	int itr0 = 0;
@@ -236,21 +240,24 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				he_strcpy(buf_extract,charbuf,2);
-				info_gpgga->utc.hour = he_a2i(charbuf);
+				nmea_data.info_gpgga.utc.hour = he_a2i(charbuf);
 				he_strcpy(&buf_extract[2],charbuf,2);
-				info_gpgga->utc.min = he_a2i(charbuf);
+				nmea_data.info_gpgga.utc.min = he_a2i(charbuf);
 				he_strcpy(&buf_extract[4],charbuf,2);
-				info_gpgga->utc.sec = he_a2i(charbuf);
+				nmea_data.info_gpgga.utc.sec = he_a2i(charbuf);
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.utc = 1;
+
 #ifdef DEBUG
-				printf("UTC    hh  %d  mm %d  ss %d\n",info_gpgga->utc.hour, info_gpgga->utc.min, info_gpgga->utc.sec);
+				printf("UTC    hh  %d  mm %d  ss %d\n",nmea_data.info_gpgga.utc.hour, nmea_data.info_gpgga.utc.min, nmea_data.info_gpgga.utc.sec);
 #endif
 			}
 			else
 			{
-				info_gpgga->utc.hour 	= 0;
-				info_gpgga->utc.min  	= 0;
-				info_gpgga->utc.sec		= 0;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgga.utc.hour 	= 0;
+				nmea_data.info_gpgga.utc.min  	= 0;
+				nmea_data.info_gpgga.utc.sec	= 0;
 #ifdef DEBUG
 				printf("UTC   INVALID\n");
 #endif
@@ -271,18 +278,19 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				intbuf = (int) ( ((float)(doublebuf)/100) );
 				doublebuf = (float)(doublebuf - intbuf *100);
 				doublebuf = intbuf + (doublebuf/60);
-				info_gpgga->lat = doublebuf;
+				nmea_data.info_gpgga.lat = doublebuf;
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.lat = 1;
 
 #ifdef DEBUG
-				printf("LAT  %f\n",info_gpgga->lat);
+				printf("LAT  %f\n",nmea_data.info_gpgga.lat);
 #endif
 
 			}
 			else
 			{
-				info_gpgga->lat = 0.0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.lat = 0.0;
 #ifdef DEBUG
 				printf("LAT  INVALID\n");
 #endif
@@ -291,17 +299,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 2:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpgga->ns = buf_extract[0] ;
+				nmea_data.info_gpgga.ns = buf_extract[0] ;
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.ns = 1;
 
 #ifdef DEBUG
-				printf("NS   %c\n",info_gpgga->ns);
+				printf("NS   %c\n",nmea_data.info_gpgga.ns);
 #endif
 			}
 			else
 			{
-				info_gpgga->ns = '0';
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.ns = '0';
 #ifdef DEBUG
 				printf("NS  INVALID\n");
 #endif
@@ -317,17 +326,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 				intbuf = (int) ( ((float)(doublebuf)/100) );
 				doublebuf = (float)(doublebuf - intbuf *100);
 				doublebuf = intbuf + (doublebuf/60);
-				info_gpgga->lon = doublebuf;
+				nmea_data.info_gpgga.lon = doublebuf;
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.lon = 1;
 
 #ifdef DEBUG
-				printf("LON  %f\n",info_gpgga->lon);
+				printf("LON  %f\n",nmea_data.info_gpgga.lon);
 #endif
 			}
 			else
 			{
-				info_gpgga->lon = 0.0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.lon = 0.0;
 #ifdef DEBUG
 				printf("LON  INVALID\n");
 #endif
@@ -336,17 +346,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpgga->ew = buf_extract[0] ;
+				nmea_data.info_gpgga.ew = buf_extract[0] ;
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.ew = 1;
 
 #ifdef DEBUG
-				printf("EW   %c\n",info_gpgga->ew);
+				printf("EW   %c\n",nmea_data.info_gpgga.ew);
 #endif
 			}
 			else
 			{
-				info_gpgga->ew = '0';
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.ew = '0';
 #ifdef DEBUG
 				printf("EW  INVALID\n");
 #endif
@@ -355,17 +366,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 5:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgga->sig = he_a2i(buf_extract);
+				nmea_data.info_gpgga.sig = he_a2i(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.sig = 1;
 
 #ifdef DEBUG
-				printf("SIG  %d\n",info_gpgga->sig);
+				printf("SIG  %d\n",nmea_data.info_gpgga.sig);
 #endif
 			}
 			else
 			{
-				info_gpgga->sig = 0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.sig = 0;
 #ifdef DEBUG
 				printf("SIG  INVALID\n");
 #endif
@@ -374,17 +386,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgga->satinuse = he_a2i(buf_extract);
+				nmea_data.info_gpgga.satinuse = he_a2i(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.satinuse = 1;
 
 #ifdef DEBUG
-				printf("satinuse  %d\n",info_gpgga->satinuse);
+				printf("satinuse  %d\n",nmea_data.info_gpgga.satinuse);
 #endif
 			}
 			else
 			{
-				info_gpgga->satinuse = 0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.satinuse = 0;
 #ifdef DEBUG
 				printf("satinuse  INVALID\n");
 #endif
@@ -393,17 +406,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpgga->HDOP = he_a2f(buf_extract);
+				nmea_data.info_gpgga.HDOP = he_a2f(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.HDOP = 1;
 
 #ifdef DEBUG
-				printf("HDOP   %f\n",info_gpgga->HDOP);
+				printf("HDOP   %f\n",nmea_data.info_gpgga.HDOP);
 #endif
 			}
 			else
 			{
-				info_gpgga->HDOP = 0.0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.HDOP = 0.0;
 #ifdef DEBUG
 				printf("HDOP  INVALID\n");
 #endif
@@ -412,17 +426,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 8:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpgga->elv = he_a2f(buf_extract);
+				nmea_data.info_gpgga.elv = he_a2f(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.elv = 1;
 
 #ifdef DEBUG
-				printf("elv   %f\n",info_gpgga->elv);
+				printf("elv   %f\n",nmea_data.info_gpgga.elv);
 #endif
 			}
 			else
 			{
-				info_gpgga->elv = 0.0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.elv = 0.0;
 #ifdef DEBUG
 				printf("elv  INVALID\n");
 #endif
@@ -431,17 +446,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 9:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpgga->elv_units = buf_extract[0] ;
+				nmea_data.info_gpgga.elv_units = buf_extract[0] ;
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.elv_units = 1;
 
 #ifdef DEBUG
-				printf("elv_units   %c\n",info_gpgga->elv_units);
+				printf("elv_units   %c\n",nmea_data.info_gpgga.elv_units);
 #endif
 			}
 			else
 			{
-				info_gpgga->elv_units = '0';
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.elv_units = '0';
 #ifdef DEBUG
 				printf("elv_units  INVALID\n");
 #endif
@@ -450,17 +466,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 10:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpgga->diff = he_a2f(buf_extract);
+				nmea_data.info_gpgga.diff = he_a2f(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.diff = 1;
 
 #ifdef DEBUG
-				printf("diff   %f\n",info_gpgga->diff);
+				printf("diff   %f\n",nmea_data.info_gpgga.diff);
 #endif
 			}
 			else
 			{
-				info_gpgga->diff = 0.0;
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.diff = 0.0;
 #ifdef DEBUG
 				printf("diff  INVALID\n");
 #endif
@@ -469,17 +486,18 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 		case 11:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpgga->diff_units = buf_extract[0] ;
+				nmea_data.info_gpgga.diff_units = buf_extract[0] ;
+
+				/*Update Status*/
+				nmea_data.sts_gpgga.B.diff_units = 1;
 
 #ifdef DEBUG
-				printf("diff_units   %c\n",info_gpgga->diff_units);
+				printf("diff_units   %c\n",nmea_data.info_gpgga.diff_units);
 #endif
 			}
 			else
 			{
-				info_gpgga->diff_units = '0';
-				nmea_vldty = NMEA_INVALID;
-
+				nmea_data.info_gpgga.diff_units = '0';
 #ifdef DEBUG
 				printf("diff_units  INVALID\n");
 #endif
@@ -507,18 +525,19 @@ int extract_nmeaGPGGA(nmeaGPGGA * info_gpgga, char *nmea_databuf)
 #endif
 			break;
 		}
-
+	}
 #ifdef DEBUG
 		printf(" \n");
+		printf("Status:  %d\n",nmea_data.sts_gpgga.U);
+		fflush(stdout);
 #endif
-	}
 	return nmea_vldty;
 }
 
 /**
  * \brief Extracts nmea_databuf data and fills info_gpgsa structure
  */
-int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
+int extract_nmeaGPGSA(char *nmea_databuf)
 {
 	char buf_extract[5] = {0};
 	int itr0 = 0;
@@ -552,16 +571,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 0:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpgsa->fix_mode = buf_extract[0] ;
+				nmea_data.info_gpgsa.fix_mode = buf_extract[0] ;
+
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.fix_mode = 1;
 
 #ifdef DEBUG
-				printf("fix_mode   %c\n",info_gpgsa->fix_mode);
+				printf("fix_mode   %c\n",nmea_data.info_gpgsa.fix_mode);
 #endif
 			}
 			else
 			{
-				info_gpgsa->fix_mode = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.fix_mode = '0' ;
 
 #ifdef DEBUG
 				printf("fix_mode   INVALID\n");
@@ -571,16 +592,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 1:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->fix_type = he_a2i(buf_extract);
+				nmea_data.info_gpgsa.fix_type = he_a2i(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.fix_type = 1;
 
 #ifdef DEBUG
-				printf("fix_type  %d\n",info_gpgsa->fix_type);
+				printf("fix_type  %d\n",nmea_data.info_gpgsa.fix_type);
 #endif
 			}
 			else
 			{
-				info_gpgsa->fix_type = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.fix_type = 0 ;
 
 #ifdef DEBUG
 				printf("fix_type  INVALID\n");
@@ -590,16 +613,18 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 2:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[0] = he_a2i(buf_extract);
+				nmea_data.info_gpgsa.sat_prn[0] = he_a2i(buf_extract);
+
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[0]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[0]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[0] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[0] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -609,16 +634,17 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 3:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[1] = he_a2i(buf_extract);
+				nmea_data.info_gpgsa.sat_prn[1] = he_a2i(buf_extract);
 
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[1]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[1]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[1] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[1] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -628,16 +654,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[2] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[2] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[2]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[2]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[2] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[2] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -647,16 +673,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 5:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[3] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[3] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[3]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[3]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[3] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[3] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -666,16 +692,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[4] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[4] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[4]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[4]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[4] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[4] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -685,16 +711,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[5] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[5] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[5]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[5]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[5] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[5] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -704,16 +730,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 8:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[6] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[6] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[6]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[6]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[6] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[6] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -723,16 +749,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 9:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[7] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[7] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[7]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[7]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[7] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[7] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -742,16 +768,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 10:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[8] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[8] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[8]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[8]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[8] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[8] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -761,16 +787,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 11:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[9] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[9] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[9]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[9]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[9] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[9] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -780,16 +806,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 12:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[10] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[10] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[10]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[10]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[10] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[10] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -799,16 +825,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 13:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsa->sat_prn[11] = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsa.sat_prn[11] = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.sat_prn = 1;
 #ifdef DEBUG
-				printf("sat_prn  %d\n",info_gpgsa->sat_prn[11]);
+				printf("sat_prn  %d\n",nmea_data.info_gpgsa.sat_prn[11]);
 #endif
 			}
 			else
 			{
-				info_gpgsa->sat_prn[11] = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.sat_prn[11] = 0 ;
 
 #ifdef DEBUG
 				printf("sat_prn  INVALID\n");
@@ -818,16 +844,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 14:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpgsa->PDOP = he_a2f(buf_extract);
-
+				nmea_data.info_gpgsa.PDOP = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.PDOP = 1;
 #ifdef DEBUG
-				printf("PDOP   %f\n",info_gpgsa->PDOP);
+				printf("PDOP   %f\n",nmea_data.info_gpgsa.PDOP);
 #endif
 			}
 			else
 			{
-				info_gpgsa->PDOP = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.PDOP = 0.0 ;
 
 #ifdef DEBUG
 				printf("PDOP  INVALID\n");
@@ -837,16 +863,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 15:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpgsa->HDOP = he_a2f(buf_extract);
-
+				nmea_data.info_gpgsa.HDOP = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.HDOP = 1;
 #ifdef DEBUG
-				printf("HDOP   %f\n",info_gpgsa->HDOP);
+				printf("HDOP   %f\n",nmea_data.info_gpgsa.HDOP);
 #endif
 			}
 			else
 			{
-				info_gpgsa->HDOP = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.HDOP = 0.0 ;
 
 #ifdef DEBUG
 				printf("HDOP  INVALID\n");
@@ -856,16 +882,16 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 		case 16:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpgsa->VDOP = he_a2f(buf_extract);
-
+				nmea_data.info_gpgsa.VDOP = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsa.B.VDOP = 1;
 #ifdef DEBUG
-				printf("VDOP   %f\n",info_gpgsa->VDOP);
+				printf("VDOP   %f\n",nmea_data.info_gpgsa.VDOP);
 #endif
 			}
 			else
 			{
-				info_gpgsa->VDOP = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsa.VDOP = 0.0 ;
 
 #ifdef DEBUG
 				printf("VDOP  INVALID\n");
@@ -882,11 +908,11 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 #endif
 			break;
 		}
+	}
 #ifdef DEBUG
+		printf("Status:  %d\n",nmea_data.sts_gpgsa.U);
 		fflush(stdout);
 #endif
-	}
-
 	return nmea_vldty;
 }
 
@@ -894,7 +920,7 @@ int extract_nmeaGPGSA(nmeaGPGSA *info_gpgsa, char *nmea_databuf)
 /**
  * \brief Extracts nmea_databuf data and fills info_gpgsv structure
  */
-int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
+int extract_nmeaGPGSV(char *nmea_databuf)
 {
 	char buf_extract[5] = {0};
 	int itr0 = 0;
@@ -934,16 +960,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 1:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->pack_count = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.pack_count = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.pack_count = 1;
 #ifdef DEBUG
-				printf("pack_count  %d\n",info_gpgsv->pack_count);
+				printf("pack_count  %d\n",nmea_data.info_gpgsv.pack_count);
 #endif
 			}
 			else
 			{
-				info_gpgsv->pack_count = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.pack_count = 0 ;
 
 #ifdef DEBUG
 				printf("pack_count INVALID\n");
@@ -953,16 +979,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 2:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->pack_index = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.pack_index = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.pack_index = 1;
 #ifdef DEBUG
-				printf("pack_index  %d\n",info_gpgsv->pack_index);
+				printf("pack_index  %d\n",nmea_data.info_gpgsv.pack_index);
 #endif
 			}
 			else
 			{
-				info_gpgsv->pack_index = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.pack_index = 0 ;
 
 #ifdef DEBUG
 				printf("pack_index INVALID\n");
@@ -972,16 +998,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 3:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->sat_count = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.sat_count = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.sat_count = 1;
 #ifdef DEBUG
-				printf("sat_count  %d\n",info_gpgsv->sat_count);
+				printf("sat_count  %d\n",nmea_data.info_gpgsv.sat_count);
 #endif
 			}
 			else
 			{
-				info_gpgsv->sat_count = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.sat_count = 0 ;
 
 #ifdef DEBUG
 				printf("sat_count INVALID\n");
@@ -991,16 +1017,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->sat_data[sat_data_idx].id = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].id = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.sat_data = 1;
 #ifdef DEBUG
-				printf("sat_data[%d].id  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].id);
+				printf("sat_data[%d].id  %d\n",sat_data_idx,nmea_data.info_gpgsv.sat_data[sat_data_idx].id);
 #endif
 			}
 			else
 			{
-				info_gpgsv->sat_data[sat_data_idx].id = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].id = 0 ;
 
 #ifdef DEBUG
 				printf("sat_data[%d].id  INVALID\n",sat_data_idx);
@@ -1010,16 +1036,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 5:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->sat_data[sat_data_idx].elv = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].elv = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.sat_data = 1;
 #ifdef DEBUG
-				printf("sat_data[%d].elv  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].elv);
+				printf("sat_data[%d].elv  %d\n",sat_data_idx,nmea_data.info_gpgsv.sat_data[sat_data_idx].elv);
 #endif
 			}
 			else
 			{
-				info_gpgsv->sat_data[sat_data_idx].elv = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].elv = 0 ;
 
 #ifdef DEBUG
 				printf("sat_data[%d].elv  INVALID\n",sat_data_idx);
@@ -1029,16 +1055,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->sat_data[sat_data_idx].azimuth = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].azimuth = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.sat_data = 1;
 #ifdef DEBUG
-				printf("sat_data[%d].azimuth  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].azimuth);
+				printf("sat_data[%d].azimuth  %d\n",sat_data_idx,nmea_data.info_gpgsv.sat_data[sat_data_idx].azimuth);
 #endif
 			}
 			else
 			{
-				info_gpgsv->sat_data[sat_data_idx].azimuth = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].azimuth = 0 ;
 
 #ifdef DEBUG
 				printf("sat_data[%d].azimuth  INVALID\n",sat_data_idx);
@@ -1048,16 +1074,16 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
-				info_gpgsv->sat_data[sat_data_idx].sig = he_a2i(buf_extract);
-
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].sig = he_a2i(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpgsv.B.sat_data = 1;
 #ifdef DEBUG
-				printf("sat_data[%d].sig  %d\n",sat_data_idx,info_gpgsv->sat_data[sat_data_idx].sig);
+				printf("sat_data[%d].sig  %d\n",sat_data_idx,nmea_data.info_gpgsv.sat_data[sat_data_idx].sig);
 #endif
 			}
 			else
 			{
-				info_gpgsv->sat_data[sat_data_idx].sig = 0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpgsv.sat_data[sat_data_idx].sig = 0 ;
 
 #ifdef DEBUG
 				printf("sat_data[%d].sig  INVALID\n",sat_data_idx);
@@ -1075,6 +1101,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 	}
 
 #ifdef DEBUG
+	printf("Status:  %d\n",nmea_data.sts_gpgsv.U);
 	printf("GPGSV ERROR:  IMPLEMENTATION PENDING \nGPGSV has multiple packets this function handles only one packet\n");
 	fflush(stdout);
 #endif
@@ -1085,7 +1112,7 @@ int extract_nmeaGPGSV(nmeaGPGSV *info_gpgsv, char *nmea_databuf)
 /**
  * \brief Extracts nmea_databuf data and fills info_gprmc structure
  */
-int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
+int extract_nmeaGPRMC(char *nmea_databuf)
 {
 	char buf_extract[15] = {0};
 	int itr0 = 0;
@@ -1121,22 +1148,23 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
 				he_strcpy(buf_extract,charbuf,2);
-				info_gprmc->utc.hour = he_a2i(charbuf);
+				nmea_data.info_gprmc.utc.hour = he_a2i(charbuf);
 				he_strcpy(&buf_extract[2],charbuf,2);
-				info_gprmc->utc.min = he_a2i(charbuf);
+				nmea_data.info_gprmc.utc.min = he_a2i(charbuf);
 				he_strcpy(&buf_extract[4],charbuf,2);
-				info_gprmc->utc.sec = he_a2i(charbuf);
+				nmea_data.info_gprmc.utc.sec = he_a2i(charbuf);
 
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.utc = 1;
 #ifdef DEBUG
-				printf("\nUTC    hh  %d  mm %d  ss %d\n",info_gprmc->utc.hour, info_gprmc->utc.min, info_gprmc->utc.sec);
+				printf("\nUTC    hh  %d  mm %d  ss %d\n",nmea_data.info_gprmc.utc.hour, nmea_data.info_gprmc.utc.min, nmea_data.info_gprmc.utc.sec);
 #endif
 			}
 			else
 			{
-				info_gprmc->utc.hour = 0;
-				info_gprmc->utc.min  = 0;
-				info_gprmc->utc.sec  = 0;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.utc.hour = 0;
+				nmea_data.info_gprmc.utc.min  = 0;
+				nmea_data.info_gprmc.utc.sec  = 0;
 
 #ifdef DEBUG
 				printf("UTC    INVALID\n");
@@ -1146,16 +1174,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 2:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gprmc->status = buf_extract[0] ;
-
+				nmea_data.info_gprmc.status = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.status = 1;
 #ifdef DEBUG
-				printf("status   %c\n",info_gprmc->status);
+				printf("status   %c\n",nmea_data.info_gprmc.status);
 #endif
 			}
 			else
 			{
-				info_gprmc->status = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.status = '0' ;
 
 #ifdef DEBUG
 				printf("status   INVALID\n");
@@ -1177,16 +1205,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				intbuf = (int) ( ((float)(doublebuf)/100) );
 				doublebuf = (float)(doublebuf - intbuf *100);
 				doublebuf = intbuf + (doublebuf/60);
-				info_gprmc->lat = doublebuf;
-
+				nmea_data.info_gprmc.lat = doublebuf;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.lat = 1;
 #ifdef DEBUG
-				printf("LAT  %f\n",info_gprmc->lat);
+				printf("LAT  %f\n",nmea_data.info_gprmc.lat);
 #endif
 			}
 			else
 			{
-				info_gprmc->lat = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.lat = 0.0 ;
 
 #ifdef DEBUG
 				printf("LAT   INVALID\n");
@@ -1196,16 +1224,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gprmc->ns = buf_extract[0] ;
-
+				nmea_data.info_gprmc.ns = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.ns = 1;
 #ifdef DEBUG
-				printf("NS   %c\n",info_gprmc->ns);
+				printf("NS   %c\n",nmea_data.info_gprmc.ns);
 #endif
 			}
 			else
 			{
-				info_gprmc->ns = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.ns = '0' ;
 
 #ifdef DEBUG
 				printf("NS   INVALID\n");
@@ -1222,16 +1250,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 				intbuf = (int) ( ((float)(doublebuf)/100) );
 				doublebuf = (float)(doublebuf - intbuf *100);
 				doublebuf = intbuf + (doublebuf/60);
-				info_gprmc->lon = doublebuf;
-
+				nmea_data.info_gprmc.lon = doublebuf;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.lon = 1;
 #ifdef DEBUG
-				printf("LON  %f\n",info_gprmc->lon);
+				printf("LON  %f\n",nmea_data.info_gprmc.lon);
 #endif
 			}
 			else
 			{
-				info_gprmc->lon = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.lon = 0.0 ;
 
 #ifdef DEBUG
 				printf("LON  INVALID\n");
@@ -1241,16 +1269,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gprmc->ew = buf_extract[0] ;
-
+				nmea_data.info_gprmc.ew = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.ew = 1;
 #ifdef DEBUG
-				printf("EW   %c\n",info_gprmc->ew);
+				printf("EW   %c\n",nmea_data.info_gprmc.ew);
 #endif
 			}
 			else
 			{
-				info_gprmc->ew = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.ew = '0' ;
 
 #ifdef DEBUG
 				printf("EW   INVALID\n");
@@ -1260,16 +1288,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gprmc->speed = he_a2f(buf_extract);
-
+				nmea_data.info_gprmc.speed = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.speed = 1;
 #ifdef DEBUG
-				printf("speed   %f\n",info_gprmc->speed);
+				printf("speed   %f\n",nmea_data.info_gprmc.speed);
 #endif
 			}
 			else
 			{
-				info_gprmc->speed = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.speed = 0.0 ;
 
 #ifdef DEBUG
 				printf("speed   INVALID\n");
@@ -1279,16 +1307,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 8:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gprmc->direction = he_a2f(buf_extract);
-
+				nmea_data.info_gprmc.direction = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.direction = 1;
 #ifdef DEBUG
-				printf("direction   %f\n",info_gprmc->direction);
+				printf("direction   %f\n",nmea_data.info_gprmc.direction);
 #endif
 			}
 			else
 			{
-				info_gprmc->direction = he_a2f(buf_extract);
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.direction = he_a2f(buf_extract);
 
 #ifdef DEBUG
 				printf("direction   INVALID\n");
@@ -1299,23 +1327,25 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 			if(nmea_datatype_isfieldvalid(buf_extract,INT_VAL))
 			{
 				he_strcpy(buf_extract,charbuf,2);
-				info_gprmc->date.day = he_a2i(charbuf);
+				nmea_data.info_gprmc.date.day = he_a2i(charbuf);
 				he_strcpy(&buf_extract[2],charbuf,2);
-				info_gprmc->date.mon = he_a2i(charbuf);
+				nmea_data.info_gprmc.date.mon = he_a2i(charbuf);
 				he_strcpy(&buf_extract[4],charbuf,2);
-				info_gprmc->date.year = he_a2i(charbuf);
-				info_gprmc->date.year = info_gprmc->date.year + 2000; // Year to be represented in YYYY hence adding 2000
+				nmea_data.info_gprmc.date.year = he_a2i(charbuf);
+				nmea_data.info_gprmc.date.year = nmea_data.info_gprmc.date.year + 2000; // Year to be represented in YYYY hence adding 2000
+
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.date = 1;
 
 #ifdef DEBUG
-				printf("DATE    dd  %d  mm %d  yy %d\n",info_gprmc->date.day, info_gprmc->date.mon, info_gprmc->date.year);
+				printf("DATE    dd  %d  mm %d  yy %d\n",nmea_data.info_gprmc.date.day, nmea_data.info_gprmc.date.mon, nmea_data.info_gprmc.date.year);
 #endif
 			}
 			else
 			{
-				info_gprmc->date.day  = 0;
-				info_gprmc->date.mon  = 0;
-				info_gprmc->date.year = 0;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.date.day  = 0;
+				nmea_data.info_gprmc.date.mon  = 0;
+				nmea_data.info_gprmc.date.year = 0;
 
 #ifdef DEBUG
 				printf("DATE   INVALID\n");
@@ -1325,16 +1355,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 10:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gprmc->declination = he_a2f(buf_extract);
-
+				nmea_data.info_gprmc.declination = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.declination = 1;
 #ifdef DEBUG
-				printf("declination   %f\n",info_gprmc->declination);
+				printf("declination   %f\n",nmea_data.info_gprmc.declination);
 #endif
 			}
 			else
 			{
-				info_gprmc->declination = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.declination = 0.0 ;
 
 #ifdef DEBUG
 				printf("declination   INVAID\n");
@@ -1344,16 +1374,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 11:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gprmc->declin_ew = buf_extract[0] ;
-
+				nmea_data.info_gprmc.declin_ew = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.declin_ew = 1;
 #ifdef DEBUG
-				printf("declin_ew   %c\n",info_gprmc->declin_ew);
+				printf("declin_ew   %c\n",nmea_data.info_gprmc.declin_ew);
 #endif
 			}
 			else
 			{
-				info_gprmc->declin_ew = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.declin_ew = '0' ;
 
 #ifdef DEBUG
 				printf("declin_ew   INVALID\n");
@@ -1363,16 +1393,16 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 		case 12:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gprmc->mode = buf_extract[0] ;
-
+				nmea_data.info_gprmc.mode = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gprmc.B.mode = 1;
 #ifdef DEBUG
-				printf("mode   %c\n",info_gprmc->mode);
+				printf("mode   %c\n",nmea_data.info_gprmc.mode);
 #endif
 			}
 			else
 			{
-				info_gprmc->mode = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gprmc.mode = '0' ;
 
 #ifdef DEBUG
 				printf("mode   INVALID\n");
@@ -1388,11 +1418,11 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 #endif
 			break;
 		}
-#ifdef DEBUG
-		fflush(stdout);
-#endif
-
 	}
+#ifdef DEBUG
+	printf("Status:  %d\n",nmea_data.sts_gprmc.U);
+	fflush(stdout);
+#endif
 
 	return nmea_vldty;
 }
@@ -1402,7 +1432,7 @@ int extract_nmeaGPRMC(nmeaGPRMC *info_gprmc, char *nmea_databuf)
 /**
  * \brief Extracts nmea_databuf data and fills info_gpvtg structure
  */
-int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
+int extract_nmeaGPVTG(char *nmea_databuf)
 {
 	char buf_extract[8] = {0};
 	int itr0 = 0;
@@ -1435,16 +1465,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 1:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpvtg->dir = he_a2f(buf_extract);
-
+				nmea_data.info_gpvtg.dir = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.dir = 1;
 #ifdef DEBUG
-				printf("dir   %f\n",info_gpvtg->dir);
+				printf("dir   %f\n",nmea_data.info_gpvtg.dir);
 #endif
 			}
 			else
 			{
-				info_gpvtg->dir = 0.0 ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.dir = 0.0 ;
 
 #ifdef DEBUG
 				printf("dir  INVALID\n");
@@ -1454,16 +1484,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 2:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpvtg->dir_t = buf_extract[0] ;
-
+				nmea_data.info_gpvtg.dir_t = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.dir_t = 1;
 #ifdef DEBUG
-				printf("dir_t   %c\n",info_gpvtg->dir_t);
+				printf("dir_t   %c\n",nmea_data.info_gpvtg.dir_t);
 #endif
 			}
 			else
 			{
-				info_gpvtg->dir_t = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.dir_t = '0' ;
 #ifdef DEBUG
 				printf("dir_t  INVALID\n");
 #endif
@@ -1472,15 +1502,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 3:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpvtg->dec = he_a2f(buf_extract);
+				nmea_data.info_gpvtg.dec = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.dec = 1;
 #ifdef DEBUG
-				printf("dec   %f\n",info_gpvtg->dec);
+				printf("dec   %f\n",nmea_data.info_gpvtg.dec);
 #endif
 			}
 			else
 			{
-				info_gpvtg->dec = 0.0;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.dec = 0.0;
 #ifdef DEBUG
 				printf("dec  INVALID\n");
 #endif
@@ -1489,15 +1520,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 4:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpvtg->dec_m = buf_extract[0] ;
+				nmea_data.info_gpvtg.dec_m = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.dec_m = 1;
 #ifdef DEBUG
-				printf("dec_m   %c\n",info_gpvtg->dec_m);
+				printf("dec_m   %c\n",nmea_data.info_gpvtg.dec_m);
 #endif
 			}
 			else
 			{
-				info_gpvtg->dec_m = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.dec_m = '0' ;
 #ifdef DEBUG
 				printf("dec_m  INVALID\n");
 #endif
@@ -1506,15 +1538,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 5:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpvtg->spn = he_a2f(buf_extract);
+				nmea_data.info_gpvtg.spn = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.spn = 1;
 #ifdef DEBUG
-				printf("spn   %f\n",info_gpvtg->spn);
+				printf("spn   %f\n",nmea_data.info_gpvtg.spn);
 #endif
 			}
 			else
 			{
-				info_gpvtg->spn = 0.0;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.spn = 0.0;
 #ifdef DEBUG
 				printf("spn  INVALID\n");
 #endif
@@ -1523,15 +1556,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 6:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpvtg->spn_n = buf_extract[0] ;
+				nmea_data.info_gpvtg.spn_n = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.spn_n = 1;
 #ifdef DEBUG
-				printf("spn_n   %c\n",info_gpvtg->spn_n);
+				printf("spn_n   %c\n",nmea_data.info_gpvtg.spn_n);
 #endif
 			}
 			else
 			{
-				info_gpvtg->spn_n = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.spn_n = '0' ;
 #ifdef DEBUG
 				printf("spn_n  INVALID\n");
 #endif
@@ -1540,15 +1574,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 7:
 			if(nmea_datatype_isfieldvalid(buf_extract,DOUBLE_VAL))
 			{
-				info_gpvtg->spk = he_a2f(buf_extract);
+				nmea_data.info_gpvtg.spk = he_a2f(buf_extract);
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.spk = 1;
 #ifdef DEBUG
-				printf("spk   %f\n",info_gpvtg->spk);
+				printf("spk   %f\n",nmea_data.info_gpvtg.spk);
 #endif
 			}
 			else
 			{
-				info_gpvtg->spk = 0.0;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.spk = 0.0;
 #ifdef DEBUG
 				printf("spk  INVALID\n");
 #endif
@@ -1557,15 +1592,16 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 		case 8:
 			if(nmea_datatype_isfieldvalid(buf_extract,CHAR_VAL))
 			{
-				info_gpvtg->spk_k = buf_extract[0] ;
+				nmea_data.info_gpvtg.spk_k = buf_extract[0] ;
+				/*Update Status*/
+				nmea_data.sts_gpvtg.B.spk_k = 1;
 #ifdef DEBUG
-				printf("spk_k   %c\n",info_gpvtg->spk_k);
+				printf("spk_k   %c\n",nmea_data.info_gpvtg.spk_k);
 #endif
 			}
 			else
 			{
-				info_gpvtg->spk_k = '0' ;
-				nmea_vldty = NMEA_INVALID;
+				nmea_data.info_gpvtg.spk_k = '0' ;
 #ifdef DEBUG
 				printf("spk_k  INVALID\n");
 #endif
@@ -1579,6 +1615,10 @@ int extract_nmeaGPVTG(nmeaGPVTG *info_gpvtg, char *nmea_databuf)
 			break;
 		}
 	}
+#ifdef DEBUG
+			printf("Status:  %d\n",nmea_data.sts_gpvtg.U);
+			fflush(stdout);
+#endif
 	return nmea_vldty;
 }
 
@@ -1657,36 +1697,36 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 #ifdef DEBUG
 			printf("GPGGA\n");
 #endif
-			nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
+			nmeabuf_sts = extract_nmeaGPGGA(nmea_inputbuf);
 			break;
 		case GPGSA:
 #ifdef DEBUG
 			printf("GPGSA\n");
 #endif
-			nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
+			nmeabuf_sts = extract_nmeaGPGSA(nmea_inputbuf);
 			break;
 		case GPGSV:
 #ifdef DEBUG
 			printf("GPGSV\n");
 #endif
-			nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
+			nmeabuf_sts = extract_nmeaGPGSV(nmea_inputbuf);
 			break;
 		case GPRMC:
 #ifdef DEBUG
 			printf("GPRMC\n");
 #endif
-			nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
+			nmeabuf_sts = extract_nmeaGPRMC(nmea_inputbuf);
 			break;
 		case GPVTG:
 #ifdef DEBUG
 			printf("GPVTG\n");
 #endif
-			nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
+			nmeabuf_sts = extract_nmeaGPVTG(nmea_inputbuf);
 			break;
 		default:
 			nmeabuf_sts = NMEA_INVALID;
 #ifdef DEBUG
-			printf("error\n");
+			printf("ERROR: Undefined NMEA string Received\n");
 #endif
 			break;
 		}

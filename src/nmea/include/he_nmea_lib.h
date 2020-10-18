@@ -349,38 +349,37 @@ typedef union _nmeaGPVTG_sts
 
 typedef struct _nmea_info_grp
 {
-	nmeaGPGGA info_gpgga;		/**< Size: 112 bytes*/
-	nmeaGPGSA info_gpgsa;		/**< Size: 80  bytes*/
-	nmeaGPGSV info_gpgsv;		/**< Size: 76  bytes*/
-	nmeaGPRMC info_gprmc;		/**< Size: 104 bytes*/
-	nmeaGPVTG info_gpvtg;		/**< Size: 64  bytes*/
-}nmea_info_grp_type;			/**< Total Size: 436 bytes*/
+	nmeaGPGGA info_gpgga;			/**< Size: 112 bytes*/
+	nmeaGPGGA_sts_type sts_gpgga;	/**< Size: 4 bytes*/
 
-typedef struct _nmea_status_grp
-{
-	nmeaGPGGA_sts_type sts_gpgga;		/**< Size: 4 bytes*/
-	nmeaGPGSA_sts_type sts_gpgsa;		/**< Size: 4 bytes*/
-	nmeaGPGSV_sts_type sts_gpgsv;		/**< Size: 4 bytes*/
-	nmeaGPRMC_sts_type sts_gprmc;		/**< Size: 4 bytes*/
-	nmeaGPVTG_sts_type sts_gpvtg;		/**< Size: 4 bytes*/
-}nmea_sts_grp_type;						/**< Total Size: 20 bytes*/
+	nmeaGPGSA info_gpgsa;			/**< Size: 80  bytes*/
+	nmeaGPGSA_sts_type sts_gpgsa;	/**< Size: 4 bytes*/
+
+	nmeaGPGSV info_gpgsv;			/**< Size: 76  bytes*/
+	nmeaGPGSV_sts_type sts_gpgsv;	/**< Size: 4 bytes*/
+
+	nmeaGPRMC info_gprmc;			/**< Size: 104 bytes*/
+	nmeaGPRMC_sts_type sts_gprmc;	/**< Size: 4 bytes*/
+
+	nmeaGPVTG info_gpvtg;			/**< Size: 64  bytes*/
+	nmeaGPVTG_sts_type sts_gpvtg;	/**< Size: 4 bytes*/
+
+}nmea_info_grp_type;			/**< Total Size:  bytes*/
 
 
-typedef struct _nmea_grp
-{
-	nmea_info_grp_type 	nmea_info_grp;		/**< Size:  440 bytes*/
-	unsigned int reserved :32;				/**< Padding */
-	nmea_sts_grp_type   nmea_sts_grp;		/**< Size:  20 bytes*/
-}nmea_grp_type;								/**< Size of nmea_grp is 464 bytes */
+/*GLOBAL NMEA BUFFERS DECLERATION*/
+extern nmea_info_grp_type	nmea_data;
+extern NMEA_DATA_STR		nmea_data_str;
+
 
 int  nmea_typecheck						(char * nmea_databuf   );
 int  nmea_FindEndMarker_validity		(char * nmea_inputbuf  );
 extern int 	nmea_checksum				(char * nmea_databuf,     int   nmea_endmarker);
-extern int  extract_nmeaGPGGA			(nmeaGPGGA * info_gpgga,  char *nmea_databuf);
-extern int  extract_nmeaGPGSA			(nmeaGPGSA * info_gpgsa,  char *nmea_databuf);
-extern int  extract_nmeaGPGSV			(nmeaGPGSV * info_gpgsv,  char *nmea_databuf);
-extern int  extract_nmeaGPRMC			(nmeaGPRMC * info_gprmc,  char *nmea_databuf);
-extern int  extract_nmeaGPVTG			(nmeaGPVTG * info_gpvtg,  char *nmea_databuf);
+extern int  extract_nmeaGPGGA			(char * nmea_databuf);
+extern int  extract_nmeaGPGSA			(char * nmea_databuf);
+extern int  extract_nmeaGPGSV			(char * nmea_databuf);
+extern int  extract_nmeaGPRMC			(char * nmea_databuf);
+extern int  extract_nmeaGPVTG			(char * nmea_databuf);
 extern int  nmea_datatype_isfieldvalid	(char 	   * buf,         nmea_datatype check);
 
 extern int 	he_nmea_extract				(char *nmea_inputbuf,     		nmea_info_grp_type *nmea_outputbuf);

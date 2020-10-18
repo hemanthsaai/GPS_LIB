@@ -14,9 +14,6 @@
 #include "../stdlib/include/he_std.h"
 #include "../restructure/Alerts.h"
 
-nmea_info_grp_type 	nmea_data;
-NMEA_DATA_STR		nmea_data_str;
-
 char *command[] = {	"AT+QGNSSRD=GGA",
 		"AT+QGNSSRD=GSA",
 		"AT+QGNSSRD=GSV",
