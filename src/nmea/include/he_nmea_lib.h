@@ -19,7 +19,7 @@
 #define NMEA_MIN_COMMA		(5)
 
 #define NMEA_MIN_LEN		(30)
-#define NMEA_MAX_LEN		(82)
+#define NMEA_MAX_LEN		(100)
 
 /*  TOBE UPDATED ONCE I HAVE HARDWARE
 #define GGA_MIN_LEN			(63)

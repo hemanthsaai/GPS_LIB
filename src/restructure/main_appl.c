@@ -31,13 +31,15 @@ int main(void) {
 
 		HW_IO_STS 	io_sts_frmHW;
 		SDCARD_RAW	consts_frm_sdcard;
-		APPLICATION_MODE curr_app_mode;
+		APPLICATION_MODE curr_app_mode = DEFAULT_MODE;
 
 		//	he_f2a_test();
 		//	return 0;
 
 		while(1)
 		{
+
+#ifdef SIMULATION
 			/* THIS is a interrupt simulator & don't use this on HARDWARE  */
 			read_GBL_INTR(&gbl_intr);
 
@@ -47,10 +49,11 @@ int main(void) {
 			read_hwio_status(&io_sts_frmHW);
 
 			curr_app_mode = prioritize_modes();
+#endif
 			application_run(curr_app_mode);
 
 #ifdef DEBUG
-			printf("!!!PERFECT Hemanth!!!"); /* prints !!!Hello Hemanth!!! */
+			printf("!!!PERFECT Hemanth!!!"); /* prints !!!Perfect Hemanth!!! */
 			fflush(stdout);
 			sleep(20);
 #endif
@@ -60,8 +63,6 @@ int main(void) {
 
 	void application_run(APPLICATION_MODE curr_app_mode)
 	{
-
-
 		switch(curr_app_mode)
 		{
 		case EMERGENCY_MODE:
@@ -82,6 +83,7 @@ int main(void) {
 			break;
 		default:
 			printf("Starting Application in DEFAULT_MODE\n");
+			nmea_main();
 			break;
 		}
 	}
