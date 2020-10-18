@@ -253,21 +253,125 @@ typedef struct _nmeaGPVTG
 } nmeaGPVTG;
 
 
+typedef struct _nmeaGPGGA_stsbits
+{
+	unsigned int 	utc			:1;	/**< GPGGA Status BIT*/
+	unsigned int	lat			:1;	/**< GPGGA Status BIT*/
+	unsigned int	ns			:1;	/**< GPGGA Status BIT*/
+	unsigned int	lon			:1;	/**< GPGGA Status BIT*/
+	unsigned int	ew			:1;	/**< GPGGA Status BIT*/
+	unsigned int	sig			:1;	/**< GPGGA Status BIT*/
+	unsigned int	satinuse 	:1;	/**< GPGGA Status BIT*/
+	unsigned int	HDOP		:1;	/**< GPGGA Status BIT*/
+	unsigned int	elv			:1;	/**< GPGGA Status BIT*/
+	unsigned int	elv_units	:1;	/**< GPGGA Status BIT*/
+	unsigned int	diff		:1;	/**< GPGGA Status BIT*/
+	unsigned int	diff_units	:1;	/**< GPGGA Status BIT*/
+	unsigned int	dgps_age	:1;	/**< GPGGA Status BIT*/
+	unsigned int	dgps_sid	:1;	/**< GPGGA Status BIT*/
+}nmeaGPGGA_stsbits_type;
+
+typedef union _nmeaGPGGA_sts
+{
+	unsigned int U;				/**< GPGGA Status*/
+	nmeaGPGGA_stsbits_type B;	/**< GPGGA Status bits*/
+}nmeaGPGGA_sts_type;
+
+typedef struct _nmeaGPGSA_stsbits
+{
+	unsigned int	fix_mode	:1;	/**< GPGSA Status BIT*/
+	unsigned int	fix_type	:1;	/**< GPGSA Status BIT*/
+	unsigned int	sat_prn		:1;	/**< GPGSA Status BIT*/
+	unsigned int	PDOP		:1;	/**< GPGSA Status BIT*/
+	unsigned int	HDOP		:1;	/**< GPGSA Status BIT*/
+	unsigned int	VDOP		:1;	/**< GPGSA Status BIT*/
+}nmeaGPGSA_stsbits_type;
+
+typedef union _nmeaGPGSA_sts
+{
+	unsigned int U;				/**< GPGSA Status*/
+	nmeaGPGSA_stsbits_type B;	/**< GPGSA Status bits*/
+}nmeaGPGSA_sts_type;
+
+typedef struct _nmeaGPGSV_stsbits
+{
+	unsigned int	pack_count	:1;	/**< GPGSV Status BIT*/
+	unsigned int	pack_index	:1;	/**< GPGSV Status BIT*/
+	unsigned int	sat_count	:1;	/**< GPGSV Status BIT*/
+	unsigned int	sat_data	:1;	/**< GPGSV Status BIT*/
+}nmeaGPGSV_stsbits_type;
+
+typedef union _nmeaGPGSV_sts
+{
+	unsigned int U;				/**< GPGSV Status*/
+	nmeaGPGSV_stsbits_type B;	/**< GPGSV Status bits*/
+}nmeaGPGSV_sts_type;
+
+typedef struct _nmeaGPRMC_stsbits
+{
+	unsigned int	utc			:1;	/**< GPRMC Status BIT*/
+	unsigned int	status		:1;	/**< GPRMC Status BIT*/
+	unsigned int	lat			:1;	/**< GPRMC Status BIT*/
+	unsigned int	ns			:1;	/**< GPRMC Status BIT*/
+	unsigned int	lon			:1;	/**< GPRMC Status BIT*/
+	unsigned int	ew			:1;	/**< GPRMC Status BIT*/
+	unsigned int	speed		:1;	/**< GPRMC Status BIT*/
+	unsigned int	direction	:1;	/**< GPRMC Status BIT*/
+	unsigned int	date		:1;	/**< GPRMC Status BIT*/
+	unsigned int	declination	:1;	/**< GPRMC Status BIT*/
+	unsigned int	declin_ew	:1;	/**< GPRMC Status BIT*/
+	unsigned int	mode		:1;	/**< GPRMC Status BIT*/
+}nmeaGPRMC_stsbits_type;
+
+typedef union _nmeaGPRMC_sts
+{
+	unsigned int U;				/**< GPRMC Status*/
+	nmeaGPRMC_stsbits_type B;	/**< GPRMC Status bits*/
+}nmeaGPRMC_sts_type;
+
+typedef struct _nmeaGPVTG_stsbits
+{
+	unsigned int	dir		:1;	/**< GPVTG Status BIT*/
+	unsigned int	dir_t	:1;	/**< GPVTG Status BIT*/
+	unsigned int	dec		:1;	/**< GPVTG Status BIT*/
+	unsigned int	dec_m	:1;	/**< GPVTG Status BIT*/
+	unsigned int	spn		:1;	/**< GPVTG Status BIT*/
+	unsigned int	spn_n	:1;	/**< GPVTG Status BIT*/
+	unsigned int	spk		:1;	/**< GPVTG Status BIT*/
+	unsigned int	spk_k	:1;	/**< GPVTG Status BIT*/
+}nmeaGPVTG_stsbits_type;
+
+typedef union _nmeaGPVTG_sts
+{
+	unsigned int U;				/**< GPVTG Status*/
+	nmeaGPVTG_stsbits_type B;	/**< GPVTG Status bits*/
+}nmeaGPVTG_sts_type;
+
 typedef struct _nmea_info_grp
 {
-	nmeaGPGGA info_gpgga;		/*Size: 112 bytes*/
-	nmeaGPGSA info_gpgsa;		/*Size: 80  bytes*/
-	nmeaGPGSV info_gpgsv;		/*Size: 76  bytes*/
-	nmeaGPRMC info_gprmc;		/*Size: 104 bytes*/
-	nmeaGPVTG info_gpvtg;		/*Size: 64  bytes*/
-}nmea_info_grp_type;			/*Total Size: 436 bytes*/
+	nmeaGPGGA info_gpgga;		/**< Size: 112 bytes*/
+	nmeaGPGSA info_gpgsa;		/**< Size: 80  bytes*/
+	nmeaGPGSV info_gpgsv;		/**< Size: 76  bytes*/
+	nmeaGPRMC info_gprmc;		/**< Size: 104 bytes*/
+	nmeaGPVTG info_gpvtg;		/**< Size: 64  bytes*/
+}nmea_info_grp_type;			/**< Total Size: 436 bytes*/
+
+typedef struct _nmea_status_grp
+{
+	nmeaGPGGA_sts_type sts_gpgga;		/**< Size: 4 bytes*/
+	nmeaGPGSA_sts_type sts_gpgsa;		/**< Size: 4 bytes*/
+	nmeaGPGSV_sts_type sts_gpgsv;		/**< Size: 4 bytes*/
+	nmeaGPRMC_sts_type sts_gprmc;		/**< Size: 4 bytes*/
+	nmeaGPVTG_sts_type sts_gpvtg;		/**< Size: 4 bytes*/
+}nmea_sts_grp_type;						/**< Total Size: 20 bytes*/
 
 
 typedef struct _nmea_grp
 {
-	nmea_info_grp_type nmea_info_grp;					/*Size:  436 bytes*/
-	nmeaPACKTYPE nmea_pkt_type;			/*Size:  8 bytes  */
-}nmea_grp_type;							/* Size of nmea_grp is 444 bytes */
+	nmea_info_grp_type 	nmea_info_grp;		/**< Size:  440 bytes*/
+	unsigned int reserved :32;				/**< Padding */
+	nmea_sts_grp_type   nmea_sts_grp;		/**< Size:  20 bytes*/
+}nmea_grp_type;								/**< Size of nmea_grp is 464 bytes */
 
 int  nmea_typecheck						(char * nmea_databuf   );
 int  nmea_FindEndMarker_validity		(char * nmea_inputbuf  );

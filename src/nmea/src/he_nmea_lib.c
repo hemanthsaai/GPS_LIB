@@ -1655,38 +1655,38 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 		{
 		case GPGGA:
 #ifdef DEBUG
-			printf("GPGGA");
+			printf("GPGGA\n");
 #endif
 			nmeabuf_sts = extract_nmeaGPGGA(&nmea_outputbuf->info_gpgga,nmea_inputbuf);
 			break;
 		case GPGSA:
 #ifdef DEBUG
-			printf("GPGSA");
+			printf("GPGSA\n");
 #endif
 			nmeabuf_sts = extract_nmeaGPGSA(&nmea_outputbuf->info_gpgsa,nmea_inputbuf);
 			break;
 		case GPGSV:
 #ifdef DEBUG
-			printf("GPGSV");
+			printf("GPGSV\n");
 #endif
 			nmeabuf_sts = extract_nmeaGPGSV(&nmea_outputbuf->info_gpgsv,nmea_inputbuf);
 			break;
 		case GPRMC:
 #ifdef DEBUG
-			printf("GPRMC");
+			printf("GPRMC\n");
 #endif
 			nmeabuf_sts = extract_nmeaGPRMC(&nmea_outputbuf->info_gprmc,nmea_inputbuf);
 			break;
 		case GPVTG:
 #ifdef DEBUG
-			printf("GPVTG");
+			printf("GPVTG\n");
 #endif
 			nmeabuf_sts = extract_nmeaGPVTG(&nmea_outputbuf->info_gpvtg,nmea_inputbuf);
 			break;
 		default:
 			nmeabuf_sts = NMEA_INVALID;
 #ifdef DEBUG
-			printf("error");
+			printf("error\n");
 #endif
 			break;
 		}

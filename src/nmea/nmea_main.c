@@ -80,7 +80,7 @@ int nmea_main(void){
 
 #ifdef SIMULATION
    FILE *fp;
-   fp = fopen("Simulation_files\\GPS_2.log","r");
+   fp = fopen("Simulation_files\\GPS_1.log","r");
    if(fp > 0)
    {
 	   while(fgets(Response,100,fp)!=NULL)
@@ -120,9 +120,6 @@ int nmea_main(void){
 	fclose(fp);
 #endif
 
-	while(1){
-
-	}
 	return nmea_sts;
 }
 #endif
