@@ -1724,7 +1724,6 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 			nmeabuf_sts = extract_nmeaGPVTG(nmea_inputbuf);
 			break;
 		default:
-			nmeabuf_sts = NMEA_INVALID;
 #ifdef DEBUG
 			printf("ERROR: Undefined NMEA string Received\n");
 #endif
@@ -1736,7 +1735,6 @@ int he_nmea_extract(char *nmea_inputbuf, nmea_info_grp_type *nmea_outputbuf)
 	}
 	else
 	{
-		nmeabuf_sts = NMEA_INVALID;
 #ifdef DEBUG
 		printf("WRONG INPUT:  %s\n",nmea_inputbuf);
 #endif
@@ -1834,4 +1832,11 @@ int he_nmea_process(nmea_info_grp_type *nmea_data,NMEA_DATA_STR *nmea_data_str)
 #endif
 	return nmeabuf_sts;
 
+}
+
+/* To Be Implemented */
+static void nmea_clearbuffers(void)
+{
+		// Clear all the Global Buffers before we use for new data
+		// I think it is enough if we just clear the flags as invalid
 }
