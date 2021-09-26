@@ -1,0 +1,9 @@
+Tools to Install
+ - Eclipse IDE
+ - Cygwin
+   Install the packages as described in the image
+   
+   
+> Open the project in eclipse
+   - open a makefile project with existing code
+   - open project properties -> c, c++ build > select generate makefiles automatically
